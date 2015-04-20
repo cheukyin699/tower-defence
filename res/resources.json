@@ -1,0 +1,19 @@
+{
+    "sounds": {
+    },
+
+    "sprites": {
+        "file": "res/textures/sheet.png",
+        "width": 16,
+        "height": 16,
+        
+        // Sprites go down here
+        // Format: name: [x, y, w, h]
+
+        // Buttons:
+        // N: Normal    O: Over     P: Pressed
+        "Button-N": [   0,   0,  50,  30],
+        "Button-O": [   0,  30,  50,  30],
+        "Button-P": [   0,  60,  50,  30]
+    }
+}
