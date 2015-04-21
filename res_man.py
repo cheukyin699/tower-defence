@@ -13,11 +13,16 @@ class Resources:
         self.parsetree = {}
         self.fonts = {}
 
+        self.status_text = ''
+
+        self.loaded = False
+
     def loadFromJson(self, fn):
         '''
         Loads datas from json file 'fn'
         '''
-        self.parsetree = json.loads(fn)
+        f = open(fn, 'r')
+        self.parsetree = json.load(f)
 
     def loadFonts(self):
         '''
@@ -25,3 +30,23 @@ class Resources:
         '''
         # Monospace
         self.fonts['monospace'] = pygame.font.SysFont('monospace', 15)
+
+    def loadSounds(self):
+        '''
+        Loads sounds and musics specified in Json file
+        '''
+        for key, data in self.parsetree['sounds'].iteritems():
+            self.sounds[key] = pygame.mixer.Sound(data)
+            self.status_text = 'Loading ' + data
+
+    def loadSprites(self):
+        '''
+        Loads the sprites specified in Json file
+        '''
+        # Load the sprite sheet
+        self.ssheet = pygame.image.load(self.parsetree['sprites']['file'])
+
+        for key, data in self.parsetree['sprites']['sprites'].iteritems():
+            # NOTE: data = rectangle which 'key' is located
+            self.sprites[key] = self.ssheet.subsurface(data)
+            self.status_text = 'Loading ' + key
