@@ -43,12 +43,17 @@ def managerinitwork():
     Loads all sounds/musics
     '''
     rmanager.loadSounds()
+    rmanager.loadMusics()
     rmanager.loadSprites()
     rmanager.loaded = True
     return
 
 loadstuff = threading.Thread(target=managerinitwork)
 loadstuff.start()
+
+
+pygame.mixer.music.load(rmanager.musics['menu'])
+pygame.mixer.music.play(-1)
 
 
 # The loading splash screen
@@ -83,4 +88,5 @@ while mode != game.Mode.exiting:
     pygame.display.flip()
 
 
+pygame.mixer.quit()
 pygame.quit()

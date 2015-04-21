@@ -2,6 +2,10 @@
     "sounds": {
     },
 
+    "musics": {
+        "menu": "res/musics/menu.wav"
+    },
+
     "sprites": {
         "file": "res/textures/sheet.png",
         

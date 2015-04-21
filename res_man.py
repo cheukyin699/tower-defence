@@ -9,6 +9,7 @@ class Resources:
     '''
     def __init__(self):
         self.sounds = {}
+        self.musics = {}
         self.sprites = {}
         self.parsetree = {}
         self.fonts = {}
@@ -30,6 +31,15 @@ class Resources:
         '''
         # Monospace
         self.fonts['monospace'] = pygame.font.SysFont('monospace', 15)
+
+    def loadMusics(self):
+        '''
+        Loads some music filenames
+        '''
+        for key, data in self.parsetree['musics'].iteritems():
+            self.musics[key] = data
+            self.status_text = 'Loading ' + data
+
 
     def loadSounds(self):
         '''
