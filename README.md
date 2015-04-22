@@ -18,7 +18,7 @@ Usage
 -----
 
 ``` sh
-    ./td.py
+./td.py
 ```
 
 
