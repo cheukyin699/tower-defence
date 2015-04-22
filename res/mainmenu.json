@@ -1,0 +1,8 @@
+{
+    "play-bt": {
+        "type": "button",
+        "sprite": "Button1",
+        "text": "Play!",
+        "pos": [0, 0]
+    }
+}

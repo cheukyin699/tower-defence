@@ -10,9 +10,9 @@
         "file": "res/textures/sheet.png",
         
         "sprites": {
-            "Button-N": [   0,   0,  50,  30],
-            "Button-O": [   0,  30,  50,  30],
-            "Button-P": [   0,  60,  50,  30]
+            "Button1-N": [   0,   0,  50,  30],
+            "Button1-O": [   0,  30,  50,  30],
+            "Button1-P": [   0,  60,  50,  30]
         }
     }
 }

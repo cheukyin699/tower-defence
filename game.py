@@ -1,6 +1,9 @@
 # File: game.py
 # Description: Provides useful classes and functions for the game
 
+import pygame
+pygame.init()
+
 
 # CLASSES
 class Mode:
@@ -23,6 +26,16 @@ class Color:
     red =       (255,   0,   0)
     green =     (  0, 255,   0)
     blue =      (  0,   0, 255)
+
+class Sprite(pygame.sprite.Sprite):
+    def __init__(self, data, rmanager):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.type = data['type']
+        self.text = data['text']
+
+    def spriteinit(self):
+
 
 class State:
     '''
@@ -88,6 +101,21 @@ class MenuState(State):
     def __init__(self, surface, rmanager):
         State.__init__(self, surface, rmanager, state=Mode.menu)
 
+        self.layout = self.rmanager.menulayout
+        self.sprites = pygame.sprite.Group()
+
+        for key, data in self.layout.iteritems():
+            if data['type'] == 'button':
+                self.sprites.append(Button(data, rmanager))
+            else:
+                self.sprites.append(Sprite(data, rmanager))
+
     def draw(self):
         self.surface.fill(Color.black)
+
+        for i in xrange(len(self.sprites)):
+            self.surface.blit(self.sprites[i]['
+
+    def update(self):
+        self.sprites.update()
 

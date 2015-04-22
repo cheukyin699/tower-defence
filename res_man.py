@@ -23,6 +23,7 @@ class Resources:
         Loads datas from json file 'fn'
         '''
         f = open(fn, 'r')
+        self.parsetree = {}
         self.parsetree = json.load(f)
 
     def loadFonts(self):
@@ -60,3 +61,9 @@ class Resources:
             # NOTE: data = rectangle which 'key' is located
             self.sprites[key] = self.ssheet.subsurface(data)
             self.status_text = 'Loading ' + key
+
+    def loadMenu(self):
+        '''
+        Loads the menu json file for the layout
+        '''
+        self.menulayout = self.parsetree

@@ -45,9 +45,15 @@ def managerinitwork():
     Loads all sprites
     Loads all sounds/musics
     '''
+    # Load from main res file
     rmanager.loadSounds()
     rmanager.loadMusics()
     rmanager.loadSprites()
+
+    # Load layouts from other res files
+    rmanager.loadFromJson('res/mainmenu.json')
+    rmanager.loadMenu()
+
     rmanager.loaded = True
     return
 
