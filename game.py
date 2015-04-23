@@ -31,11 +31,37 @@ class Sprite(pygame.sprite.Sprite):
     def __init__(self, data, rmanager):
         pygame.sprite.Sprite.__init__(self)
 
+        self.sname = data['sprite']
         self.type = data['type']
         self.text = data['text']
+        self.state = ''
 
-    def spriteinit(self):
+        self.rmanager = rmanager
 
+        # If the type is a sprite, then load it up
+        if self.type == 'sprite':
+            self.image = rmanager.sprites[data['sprite']]
+            self.rect = self.image.get_rect()
+            self.rect.x = data['pos'][0]
+            self.rect.y = data['pos'][1]
+
+class Button(Sprite):
+    def __init__(self, data, rmanager):
+        Sprite.__init__(self, data, rmanager)
+
+        # Set to normal state (non-pressed)
+        self.state = 'N'
+
+        self.image = rmanager.sprites[self.sname + '-' + self.state]
+        self.rect = self.image.get_rect()
+        self.rect.x = data['pos'][0]
+        self.rect.y = data['pos'][1]
+
+    def update(self):
+        self.image = self.rmanager.sprites[self.sname + '-' + self.state]
+        label = self.rmanager.fonts['monospace'].render(self.text, False, Color.black)
+        labelrect = label.get_rect()
+        self.image.blit(label, (self.rect.w/2-labelrect.w/2, self.rect.h/2-labelrect.h/2))
 
 class State:
     '''
@@ -106,15 +132,26 @@ class MenuState(State):
 
         for key, data in self.layout.iteritems():
             if data['type'] == 'button':
-                self.sprites.append(Button(data, rmanager))
+                self.sprites.add(Button(data, rmanager))
             else:
-                self.sprites.append(Sprite(data, rmanager))
+                self.sprites.add(Sprite(data, rmanager))
+
+    def handlemousestate(self, (mx, my), state='N'):
+        '''
+        'N' is for normal
+        'O' is for over
+        'P' is for pressed
+        '''
+        for s in self.sprites.sprites():
+            if s.rect.collidepoint(mx, my):
+                s.state = state
+            else:
+                s.state = 'N'
 
     def draw(self):
         self.surface.fill(Color.black)
 
-        for i in xrange(len(self.sprites)):
-            self.surface.blit(self.sprites[i]['
+        self.sprites.draw(self.surface)
 
     def update(self):
         self.sprites.update()

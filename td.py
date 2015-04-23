@@ -107,6 +107,14 @@ while mode != game.Mode.exiting:
         if evt.type == QUIT:
             mode = game.Mode.exiting
 
+    # Handles mouse
+    states[-1].handlemousestate(pygame.mouse.get_pos(), 'O')
+    if any(pygame.mouse.get_pressed()):
+        states[-1].handlemousestate(pygame.mouse.get_pos(), 'P')
+
+
+    # Update and draw
+    states[-1].update()
     states[-1].draw()
 
     clock.tick(60)
