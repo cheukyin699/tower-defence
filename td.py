@@ -96,7 +96,14 @@ while mode != game.Mode.exiting:
 
         # Checks them ONE BY ONE
         if states[-1].state == game.Mode.menu:
+            # Check for menu
             states.append(game.MenuState(surface, rmanager))
+        elif states[-1].state == game.Mode.exiting:
+            # Check for exit
+            pass
+        else:
+            # Error: unknown/unimplemented state
+            states.append(game.ErrorState(surface, rmanager, 'Error: Unimplemented state. Please contact author of program.'))
 
         # Remove the LONER (safety issue)
         if len(states) > 1:

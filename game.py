@@ -57,11 +57,25 @@ class Button(Sprite):
         self.rect.x = data['pos'][0]
         self.rect.y = data['pos'][1]
 
+        self.cb = None
+        self.cb_args = []
+
+    def callback(self, func, *args):
+        self.cb = func
+        self.cb_args = args
+
+    def do_callback(self):
+        self.cb(*self.cb_args)
+
     def update(self):
-        self.image = self.rmanager.sprites[self.sname + '-' + self.state]
+        self.image = self.rmanager.sprites[self.sname + '-' + self.state].copy()
         label = self.rmanager.fonts['monospace'].render(self.text, False, Color.black)
         labelrect = label.get_rect()
         self.image.blit(label, (self.rect.w/2-labelrect.w/2, self.rect.h/2-labelrect.h/2))
+
+        # If clicked
+        if self.state == 'P' and self.cb:
+            self.do_callback()
 
 class State:
     '''
@@ -74,6 +88,15 @@ class State:
 
         self.SIZE = (surface.get_rect().w, surface.get_rect().h)
 
+    def changestate(self, state):
+        self.state = state
+
+    def handlemousestate(self, (x, y), mstate):
+        pass
+
+    def update(self):
+        pass
+
 class ErrorState(State):
     '''
     The class for handling unexpected errors.
@@ -81,7 +104,7 @@ class ErrorState(State):
     (Or maybe if the sky is falling, then I'll consider.)
     '''
     def __init__(self, surface, rmanager, mesg):
-        State.__init__(self, surface, rmanager, mesg, state=Mode.errormsg)
+        State.__init__(self, surface, rmanager, state=Mode.errormsg)
 
         self.mesg = mesg
 
@@ -132,11 +155,16 @@ class MenuState(State):
 
         for key, data in self.layout.iteritems():
             if data['type'] == 'button':
-                self.sprites.add(Button(data, rmanager))
+                bt = Button(data, rmanager)
+                if key == 'play-bt':
+                    bt.callback(self.changestate, Mode.playing)
+                elif key == 'quit-bt':
+                    bt.callback(self.changestate, Mode.exiting)
+                self.sprites.add(bt)
             else:
                 self.sprites.add(Sprite(data, rmanager))
 
-    def handlemousestate(self, (mx, my), state='N'):
+    def handlemousestate(self, (mx, my), mstate='N'):
         '''
         'N' is for normal
         'O' is for over
@@ -144,7 +172,7 @@ class MenuState(State):
         '''
         for s in self.sprites.sprites():
             if s.rect.collidepoint(mx, my):
-                s.state = state
+                s.state = mstate
             else:
                 s.state = 'N'
 
