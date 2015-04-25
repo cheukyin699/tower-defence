@@ -3,6 +3,7 @@
         "type": "button",
         "sprite": "Button1",
         "text": "Play!",
+        "sound": "wood-click",
         "pos": [50, 200]
     },
 
@@ -10,6 +11,7 @@
         "type": "button",
         "sprite": "Button1",
         "text": "Quit",
+        "sound": "wood-click",
         "pos": [70, 250]
     }
 }

@@ -1,5 +1,6 @@
 {
     "sounds": {
+    	"wood-click": "res/sounds/wood-click.wav"
     },
 
     "musics": {

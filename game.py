@@ -59,6 +59,10 @@ class Button(Sprite):
 
         self.cb = None
         self.cb_args = []
+        
+        # Sound on button click
+        self.sound = data['sound']
+        self.played = False
 
     def callback(self, func, *args):
         self.cb = func
@@ -76,6 +80,15 @@ class Button(Sprite):
         # If clicked
         if self.state == 'P' and self.cb:
             self.do_callback()
+            
+        # If hovered
+        if self.state == 'O' and self.sound and not self.played:
+            self.rmanager.sounds[self.sound].play()
+            self.played = True
+            
+        # If normal
+        if self.state == 'N':
+            self.played = False
 
 class State:
     '''
@@ -184,3 +197,18 @@ class MenuState(State):
     def update(self):
         self.sprites.update()
 
+class GameState(State):
+    '''
+    The class for handling the playing state
+    '''
+    def __init__(self, surface, rmanager):
+        State.__init__(self, surface, rmanager, state=Mode.playing)
+
+    def draw(self):
+        self.surface.fill(Color.black)
+
+    def update(self):
+        pass
+
+    def handlemousestate(self, (mx, my), mstate='N'):
+        pass
