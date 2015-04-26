@@ -1,7 +1,7 @@
 # File: res_man.py
 # Description: Manages all the resources
 
-import pygame, json
+import pygame, jsonutils
 
 class Resources:
     '''
@@ -24,7 +24,7 @@ class Resources:
         '''
         f = open(fn, 'r')
         self.parsetree = {}
-        self.parsetree = json.load(f)
+        self.parsetree = jsonutils.load(f)
 
     def loadFonts(self):
         '''
