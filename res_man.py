@@ -66,4 +66,10 @@ class Resources:
         '''
         Loads the menu json file for the layout
         '''
-        self.menulayout = self.parsetree
+        self.menulayout = self.parsetree.copy()
+
+    def loadData(self):
+        '''
+        Loads all the enemy information, tower stats, and the likes
+        '''
+        self.data = self.parsetree.copy()

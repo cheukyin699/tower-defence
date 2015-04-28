@@ -2,6 +2,7 @@
 # Description: Provides useful classes and functions for the game
 
 import pygame
+from cairo._cairo import Surface
 pygame.init()
 
 
@@ -41,6 +42,8 @@ class Sprite(pygame.sprite.Sprite):
         # If the type is a sprite, then load it up
         if self.type == 'sprite':
             self.image = rmanager.sprites[data['sprite']]
+            if data.has_key('size'):
+                self.image = pygame.transform.scale(self.image, data['size'])
             self.rect = self.image.get_rect()
             self.rect.x = data['pos'][0]
             self.rect.y = data['pos'][1]
@@ -174,6 +177,9 @@ class MenuState(State):
                 elif key == 'quit-bt':
                     bt.callback(self.changestate, Mode.exiting)
                 self.sprites.add(bt)
+            elif key == 'background':
+                s = Sprite(data, rmanager)
+                self.bg = s
             else:
                 self.sprites.add(Sprite(data, rmanager))
 
@@ -192,10 +198,44 @@ class MenuState(State):
     def draw(self):
         self.surface.fill(Color.black)
 
+        self.surface.blit(self.bg.image, (0, 0))
         self.sprites.draw(self.surface)
 
     def update(self):
         self.sprites.update()
+        
+class GameMenu(pygame.sprite.Sprite):
+    '''
+    The class responsible for responding to
+    clicks on the menu
+    The in-game menu will be positioned on the
+    bottom of the screen
+    
+    Buttons that should be included:
+    - Buy tower(s) selection
+    - Upgrade menu
+    '''
+    def __init__(self, surface, rmanager, gs):
+        pygame.sprite.Sprite.__init__(self)
+        
+        self.gs = gs
+        
+        self.image = pygame.surface.Surface((surface.get_rect().w, surface.get_rect().h*.25))
+        self.image.fill(Color.white)
+        self.rect = self.image.get_rect()
+        self.rect.y = surface.get_rect().h*.75
+        
+        # Have focus on selected tower. If focus is None,
+        # menu displays normal menu stuff
+        self.focus = None
+        
+    def draw(self, surface):
+        self.image.fill(Color.white)
+        if self.focus == None:
+            surface.blit(self.image, (self.rect.x, self.rect.y))
+        
+    def handlemousestate(self, (mx, my), mstate='N'):
+        pass
 
 class GameState(State):
     '''
@@ -203,12 +243,36 @@ class GameState(State):
     '''
     def __init__(self, surface, rmanager):
         State.__init__(self, surface, rmanager, state=Mode.playing)
+        
+        # All sprite groups
+        self.towers = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
+        self.gm = GameMenu(self.surface, self.rmanager, self)
+        
+        # Some properties
+        self.lives = 100
+        self.money = 1000
+        
+        self.waves = []
 
     def draw(self):
         self.surface.fill(Color.black)
+        
+        self.enemies.draw(self.surface)
+        self.towers.draw(self.surface)
+        self.gm.draw(self.surface)
 
     def update(self):
-        pass
+        self.enemies.update()
+        self.towers.update()
 
     def handlemousestate(self, (mx, my), mstate='N'):
-        pass
+        # Check all towers
+        for s in self.towers.sprites():
+            if s.rect.collidepoint(mx, my):
+                s.state = mstate
+            else:
+                s.state = 'N'
+        # Check the game menu
+        if self.gm.rect.collidepoint(mx, my):
+            self.gm.handlemousestate((mx, my), mstate)

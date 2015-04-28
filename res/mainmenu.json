@@ -13,5 +13,21 @@
         "text": "Quit",
         "sound": "wood-click",
         "pos": [70, 250]
+    },
+    
+    "background": {
+    	"type": "sprite",
+    	"sprite": "menu-back",
+    	"text": "",
+    	"pos": [0, 0],
+    	"size": [800, 500]
+    },
+    
+    "td-label": {
+    	"type": "sprite",
+    	"sprite": "td-label",
+    	"text": "",
+    	"pos": [300, 50],
+    	"size": [400, 60]
     }
 }
