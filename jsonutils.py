@@ -5,16 +5,16 @@ import json, re
 pat = re.compile('(//.*\n)')
 
 def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None, parse_int=None,
-          parse_constant=None, object_pairs_hook=None, **kw):
+          parse_constant=None):
     s = re.sub(pat, '', s)
     return json.loads(s, encoding, cls, object_hook, parse_float,
-                      parse_int, parse_constant, object_pairs_hook)
+                      parse_int, parse_constant)
 
 def load(fp, encoding=None, cls=None, object_hook=None, parse_float=None, parse_int=None,
-         parse_constant=None, object_pairs_hook=None, **kw):
+         parse_constant=None):
     txt = fp.read()
     fp.close()
-    return loads(txt, encoding, cls, object_hook, parse_float, parse_int, parse_constant, object_pairs_hook)
+    return loads(txt, encoding, cls, object_hook, parse_float, parse_int, parse_constant)
 
 if __name__ == '__main__':
     jsontest = '''

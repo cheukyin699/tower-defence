@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # File: game.py
 # Description: Provides useful classes and functions for the game
 
@@ -24,9 +25,9 @@ class Color:
     '''
     black =     (  0,   0,   0)
     white =     (255, 255, 255)
-    red =       (255,   0,   0)
-    green =     (  0, 255,   0)
-    blue =      (  0,   0, 255)
+    red =       (200,   0,   0)
+    green =     (  0, 200,   0)
+    blue =      (  0,   0, 200)
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, data, rmanager):
@@ -217,7 +218,8 @@ class GameMenu(pygame.sprite.Sprite):
     '''
     def __init__(self, surface, rmanager, gs):
         pygame.sprite.Sprite.__init__(self)
-        
+
+        self.rmanager = rmanager
         self.gs = gs
         
         self.image = pygame.surface.Surface((surface.get_rect().w, surface.get_rect().h*.25))
@@ -228,9 +230,22 @@ class GameMenu(pygame.sprite.Sprite):
         # Have focus on selected tower. If focus is None,
         # menu displays normal menu stuff
         self.focus = None
+
+    def drawMoney(self):
+        moneylbl = self.rmanager.fonts['monospace'].render("$"+str(self.gs.money), True, Color.green)
+        self.image.blit(moneylbl, (0,0))
+
+    def drawLives(self):
+        liveslbl = self.rmanager.fonts['monospace'].render("LF:"+str(self.gs.lives), False, Color.red)
+        self.image.blit(liveslbl, (0, liveslbl.get_rect().h))
         
     def draw(self, surface):
         self.image.fill(Color.white)
+
+        # Draw some labels first
+        self.drawMoney()
+        self.drawLives()
+
         if self.focus == None:
             surface.blit(self.image, (self.rect.x, self.rect.y))
         

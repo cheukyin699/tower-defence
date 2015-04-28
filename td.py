@@ -54,6 +54,10 @@ def managerinitwork():
     rmanager.loadFromJson('res/mainmenu.json')
     rmanager.loadMenu()
 
+    # Load tower, waves, enemy data
+    rmanager.loadFromJson('res/datas.json')
+    rmanager.loadData()
+
     rmanager.loaded = True
     return
 
