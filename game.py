@@ -3,7 +3,7 @@
 # Description: Provides useful classes and functions for the game
 
 import pygame
-from cairo._cairo import Surface
+import towers
 pygame.init()
 
 
@@ -28,6 +28,8 @@ class Color:
     red =       (200,   0,   0)
     green =     (  0, 200,   0)
     blue =      (  0,   0, 200)
+
+    yellow =    (255, 255,   0)
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, data, rmanager):
@@ -221,6 +223,8 @@ class GameMenu(pygame.sprite.Sprite):
 
         self.rmanager = rmanager
         self.gs = gs
+
+        self.tlist = pygame.sprite.Group()
         
         self.image = pygame.surface.Surface((surface.get_rect().w, surface.get_rect().h*.25))
         self.image.fill(Color.white)
@@ -231,6 +235,16 @@ class GameMenu(pygame.sprite.Sprite):
         # menu displays normal menu stuff
         self.focus = None
 
+        # Drag selected tower (buy it)
+        self.drag = None
+
+        # Init towers
+        ind = 0
+        for key, data in self.rmanager.data['towers'].iteritems():
+            t = towers.Tower(self.rmanager, data, (50*ind+100, 5))
+            self.tlist.add(t)
+            ind += 1
+
     def drawMoney(self):
         moneylbl = self.rmanager.fonts['monospace'].render("$"+str(self.gs.money), True, Color.green)
         self.image.blit(moneylbl, (0,0))
@@ -238,20 +252,6 @@ class GameMenu(pygame.sprite.Sprite):
     def drawLives(self):
         liveslbl = self.rmanager.fonts['monospace'].render("LF:"+str(self.gs.lives), False, Color.red)
         self.image.blit(liveslbl, (0, liveslbl.get_rect().h))
-
-    def drawTowers(self):
-        '''
-        Blits all the towers (and corresponding moneys)
-        to screen
-        '''
-        ind = 0
-        for key, data in self.rmanager.data['towers'].iteritems():
-            costlbl = self.rmanager.fonts['monospace'].render(data['dmg'], True, Color.yellow)
-            img = self.rmanager.sprites[data['sprite']].copy()
-            img.blit(costlbl, (0,0))
-            self.image.blit(img, (50*ind, 0))
-
-            ind += 1
 
     def draw(self, surface):
         self.image.fill(Color.white)
@@ -261,10 +261,27 @@ class GameMenu(pygame.sprite.Sprite):
         self.drawLives()
 
         if self.focus == None:
+            # Draw some other stuffs
+            self.tlist.draw(self.image)
+
+            # If you are dragging
+            if self.drag != None:
+                surface.blit(self.drag[0].orgimage, self.drag[1])
+
             surface.blit(self.image, (self.rect.x, self.rect.y))
-        
+
     def handlemousestate(self, (mx, my), mstate='N'):
-        pass
+        if self.focus == None:
+            if self.drag != None and mstate == 'U':
+                self.drag = None
+            elif mstate == 'P':
+                for t in self.tlist.sprites():
+                    if t.rect.collidepoint(mx,my):
+                        # If you clicked the tower, just set dragged tower
+                        # and break out of loop, because it is impossible to
+                        # click on multiple ones
+                        self.drag = [t, (mx-25,my+self.rect.y-25)]
+                        break
 
 class GameState(State):
     '''
@@ -291,6 +308,10 @@ class GameState(State):
         self.towers.draw(self.surface)
         self.gm.draw(self.surface)
 
+        # Check for dragging something
+        if self.gm.drag != None:
+            self.surface.blit(self.gm.drag[0].orgimage, self.gm.drag[1])
+
     def update(self):
         self.enemies.update()
         self.towers.update()
@@ -304,4 +325,11 @@ class GameState(State):
                 s.state = 'N'
         # Check the game menu
         if self.gm.rect.collidepoint(mx, my):
-            self.gm.handlemousestate((mx, my), mstate)
+            self.gm.handlemousestate((mx, my-self.gm.rect.y), mstate)
+        # Check if you are dragging something from the game menu
+        if self.gm.drag != None and mstate == 'U':
+            t = towers.rTower(self.gm.drag[0])
+            t.rect.x = mx-25
+            t.rect.y = my-25
+            self.towers.add(t)
+            self.gm.drag = None

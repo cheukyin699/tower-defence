@@ -116,16 +116,16 @@ while mode != game.Mode.exiting:
         if len(states) > 1:
             states.pop(0)
 
+    # Handles mouse
+    states[-1].handlemousestate(pygame.mouse.get_pos(), 'O')
 
     for evt in pygame.event.get():
         if evt.type == QUIT:
             mode = game.Mode.exiting
-
-    # Handles mouse
-    states[-1].handlemousestate(pygame.mouse.get_pos(), 'O')
-    if any(pygame.mouse.get_pressed()):
-        states[-1].handlemousestate(pygame.mouse.get_pos(), 'P')
-
+        elif evt.type == MOUSEBUTTONDOWN:
+            states[-1].handlemousestate(pygame.mouse.get_pos(), 'P')
+        elif evt.type == MOUSEBUTTONUP:
+            states[-1].handlemousestate(pygame.mouse.get_pos(), 'U')
 
     # Update and draw
     states[-1].update()
