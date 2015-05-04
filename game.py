@@ -238,7 +238,21 @@ class GameMenu(pygame.sprite.Sprite):
     def drawLives(self):
         liveslbl = self.rmanager.fonts['monospace'].render("LF:"+str(self.gs.lives), False, Color.red)
         self.image.blit(liveslbl, (0, liveslbl.get_rect().h))
-        
+
+    def drawTowers(self):
+        '''
+        Blits all the towers (and corresponding moneys)
+        to screen
+        '''
+        ind = 0
+        for key, data in self.rmanager.data['towers'].iteritems():
+            costlbl = self.rmanager.fonts['monospace'].render(data['dmg'], True, Color.yellow)
+            img = self.rmanager.sprites[data['sprite']].copy()
+            img.blit(costlbl, (0,0))
+            self.image.blit(img, (50*ind, 0))
+
+            ind += 1
+
     def draw(self, surface):
         self.image.fill(Color.white)
 

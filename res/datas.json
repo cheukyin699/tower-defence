@@ -1,6 +1,7 @@
 {
     "towers": {
         "gun-turret": {
+            "sprite": "gunturret",
             "cost": 200,
             "rate": 15,
             "dmg": 5
