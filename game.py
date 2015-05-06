@@ -266,7 +266,10 @@ class GameMenu(pygame.sprite.Sprite):
 
             # If you are dragging
             if self.drag != None:
-                surface.blit(self.drag[0].orgimage, self.drag[1])
+                mp = list(pygame.mouse.get_pos())
+                mp[0] -= 25
+                mp[1] -= 25
+                surface.blit(self.drag.orgimage, mp)
 
             surface.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -276,11 +279,11 @@ class GameMenu(pygame.sprite.Sprite):
                 self.drag = None
             elif mstate == 'P':
                 for t in self.tlist.sprites():
-                    if t.rect.collidepoint(mx,my):
+                    if t.rect.collidepoint(mx,my) and self.gs.money-t.cost >= 0:
                         # If you clicked the tower, just set dragged tower
                         # and break out of loop, because it is impossible to
                         # click on multiple ones
-                        self.drag = [t, (mx-25,my+self.rect.y-25)]
+                        self.drag = t
                         break
 
 class GameState(State):
@@ -310,7 +313,10 @@ class GameState(State):
 
         # Check for dragging something
         if self.gm.drag != None:
-            self.surface.blit(self.gm.drag[0].orgimage, self.gm.drag[1])
+            mp = list(pygame.mouse.get_pos())
+            mp[0] -= 25
+            mp[1] -= 25
+            self.surface.blit(self.gm.drag.orgimage, mp)
 
     def update(self):
         self.enemies.update()
@@ -328,8 +334,11 @@ class GameState(State):
             self.gm.handlemousestate((mx, my-self.gm.rect.y), mstate)
         # Check if you are dragging something from the game menu
         if self.gm.drag != None and mstate == 'U':
-            t = towers.rTower(self.gm.drag[0])
+            # If you've just placed down something from the menu...
+            # TAKE YO MONEY
+            t = towers.rTower(self.gm.drag)
             t.rect.x = mx-25
             t.rect.y = my-25
             self.towers.add(t)
             self.gm.drag = None
+            self.money -= t.cost
