@@ -271,7 +271,7 @@ class GameMenu(pygame.sprite.Sprite):
                 mp[1] -= 25
                 surface.blit(self.drag.orgimage, mp)
 
-            surface.blit(self.image, (self.rect.x, self.rect.y))
+        surface.blit(self.image, (self.rect.x, self.rect.y))
 
     def handlemousestate(self, (mx, my), mstate='N'):
         if self.focus == None:
@@ -292,21 +292,24 @@ class GameState(State):
     '''
     def __init__(self, surface, rmanager):
         State.__init__(self, surface, rmanager, state=Mode.playing)
-        
+
         # All sprite groups
         self.towers = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.gm = GameMenu(self.surface, self.rmanager, self)
-        
+
         # Some properties
         self.lives = 100
         self.money = 1000
-        
+
+        # The wave data
         self.waves = []
+        # The wave that you are currently on
+        self.wave = 0
 
     def draw(self):
         self.surface.fill(Color.black)
-        
+
         self.enemies.draw(self.surface)
         self.towers.draw(self.surface)
         self.gm.draw(self.surface)
@@ -323,22 +326,39 @@ class GameState(State):
         self.towers.update()
 
     def handlemousestate(self, (mx, my), mstate='N'):
-        # Check all towers
-        for s in self.towers.sprites():
-            if s.rect.collidepoint(mx, my):
-                s.state = mstate
-            else:
-                s.state = 'N'
+        if mstate == 'U':
+            # Check to see if you are clicking off the focused
+            # tower. To click off the focused tower, click on
+            # something else
+            if self.gm.focus:
+                self.gm.focus = None
+
+            # Check all towers
+            for t in self.towers.sprites():
+                if t.rect.collidepoint(mx, my):
+                    # Set the focus point
+                    # Break after setting the focus point
+                    self.gm.focus = t
+                    break
+
         # Check the game menu
         if self.gm.rect.collidepoint(mx, my):
             self.gm.handlemousestate((mx, my-self.gm.rect.y), mstate)
         # Check if you are dragging something from the game menu
+        # and you drop it in the screen
         if self.gm.drag != None and mstate == 'U':
             # If you've just placed down something from the menu...
-            # TAKE YO MONEY
-            t = towers.rTower(self.gm.drag)
-            t.rect.x = mx-25
-            t.rect.y = my-25
-            self.towers.add(t)
-            self.gm.drag = None
-            self.money -= t.cost
+            # ...and you didn't place it on top another tower
+            overlap = pygame.sprite.spritecollideany(self.gm.drag, self.towers)
+            if overlap == None:
+                t = towers.rTower(self.gm.drag)
+                t.rect.x = mx-25
+                t.rect.y = my-25
+                self.towers.add(t)
+                self.gm.drag = None
+                # TAKE YO MONEY
+                self.money -= t.cost
+            else:
+                # If you placed it on top of another
+                # tower, remove and try again
+                self.gm.drag = None

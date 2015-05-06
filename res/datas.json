@@ -1,10 +1,12 @@
 {
     "towers": {
         "gun-turret": {
-            "sprite": "gunturret",
             "cost": 200,
+            "dmg": 5,
+        	"name": "Gun Turret",
+            "range": 150,
             "rate": 15,
-            "dmg": 5
+            "sprite": "gunturret"
         }
     },
 	"waves": [
