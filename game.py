@@ -4,6 +4,7 @@
 
 import pygame
 import towers
+import enemy
 pygame.init()
 
 
@@ -70,6 +71,10 @@ class Button(Sprite):
         self.sound = data['sound']
         self.played = False
 
+    @classmethod
+    def sMade(cls, *args, **kwargs):
+        return cls(kwargs, kwargs.get('rmanager'))
+
     def callback(self, func, *args):
         self.cb = func
         self.cb_args = args
@@ -77,7 +82,13 @@ class Button(Sprite):
     def do_callback(self):
         self.cb(*self.cb_args)
 
+    def draw(self, surface):
+        surface.blit(self.image, (self.rect.x, self.rect.y))
+
     def update(self):
+        # If up
+        if self.state == 'U':
+            self.state = 'O'
         self.image = self.rmanager.sprites[self.sname + '-' + self.state].copy()
         label = self.rmanager.fonts['monospace'].render(self.text, False, Color.black)
         labelrect = label.get_rect()
@@ -238,6 +249,11 @@ class GameMenu(pygame.sprite.Sprite):
         # Drag selected tower (buy it)
         self.drag = None
 
+        # The play button (starts rounds)
+        self.play_bt = Button.sMade(type='button', text='Play', sprite='Button1', sound='wood-click',
+                pos=[self.rect.w*.75, 0], size=[80, self.rect.h], rmanager=self.rmanager)
+        self.play_bt.callback(self.gs.nextWave)
+
         # Init towers
         ind = 0
         for key, data in self.rmanager.data['towers'].iteritems():
@@ -261,6 +277,7 @@ class GameMenu(pygame.sprite.Sprite):
         self.drawLives()
 
         if self.focus == None:
+            # Display the main game menu
             # Draw some other stuffs
             self.tlist.draw(self.image)
 
@@ -270,6 +287,23 @@ class GameMenu(pygame.sprite.Sprite):
                 mp[0] -= 25
                 mp[1] -= 25
                 surface.blit(self.drag.orgimage, mp)
+
+            # Update play button
+            self.play_bt.update()
+            # Draw play button
+            self.play_bt.draw(self.image)
+        else:
+            # If you have focused on some random tower,
+            # display the upgrade menu
+            namelbl = self.rmanager.fonts['monospace'].render(self.focus.name, True, Color.blue)
+            self.image.blit(namelbl, (0, namelbl.get_rect().h*2))
+            # Draw the range (with some ALPHA)
+            rngcircle = pygame.surface.Surface((self.focus.range*2, self.focus.range*2))
+            rngcircle.set_alpha(150)
+            # Draw the circle
+            pygame.draw.circle(rngcircle, (50,50,50,75), (self.focus.range, self.focus.range), self.focus.range)
+            # Blit the circle
+            surface.blit(rngcircle, (self.focus.rect.centerx-self.focus.range, self.focus.rect.centery-self.focus.range))
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -285,6 +319,10 @@ class GameMenu(pygame.sprite.Sprite):
                         # click on multiple ones
                         self.drag = t
                         break
+            if self.play_bt.rect.collidepoint(mx,my):
+                self.play_bt.state = mstate
+            elif self.play_bt.state == 'O':
+                self.play_bt.state = 'N'
 
 class GameState(State):
     '''
@@ -302,10 +340,14 @@ class GameState(State):
         self.lives = 100
         self.money = 1000
 
-        # The wave data
-        self.waves = []
         # The wave that you are currently on
         self.wave = 0
+        # The enemy that you are currently on
+        self.noen = 0
+        # Should I spawn enemies?
+        self.runthru_enemy = False
+        # Timer
+        self.en_cd = 0
 
     def draw(self):
         self.surface.fill(Color.black)
@@ -317,13 +359,55 @@ class GameState(State):
         # Check for dragging something
         if self.gm.drag != None:
             mp = list(pygame.mouse.get_pos())
+            # Draw the range first (with some ALPHA)
+            rngcircle = pygame.surface.Surface((self.gm.drag.range*2, self.gm.drag.range*2))
+            rngcircle.set_alpha(150)
+            # Check for overlapping
+            overlap = False
+            for t in self.towers.sprites():
+                if t.rect.collidepoint(mp[0], mp[1]):
+                    overlap = True
+                    break
+            col = (50,50,50,75)
+            if overlap:
+                col = (200,0,0,75)
             mp[0] -= 25
             mp[1] -= 25
+            # Draw circle with alpha
+            pygame.draw.circle(rngcircle, col, (self.gm.drag.range, self.gm.drag.range), self.gm.drag.range)
+            self.surface.blit(rngcircle, (mp[0]-self.gm.drag.range+25, mp[1]-self.gm.drag.range+25))
             self.surface.blit(self.gm.drag.orgimage, mp)
 
     def update(self):
+        if self.runthru_enemy and self.en_cd <= 0:
+            if self.noen >= len(self.rmanager.data['waves'][self.wave]):
+                # If done spawning enemies
+                self.noen = 0
+                self.wave += 1
+                self.runthru_enemy = False
+            else:
+                enno = self.rmanager.data['waves'][self.wave][self.noen]
+                if enno == 0:
+                    # WAIT FOR TICKS (15)
+                    self.en_cd = 15
+                else:
+                    self.enemies.add(enemy.Enemy(enno))
+                self.noen += 1
+        elif self.en_cd > 0:
+            self.en_cd -= 1
         self.enemies.update()
-        self.towers.update()
+        self.towers.update(self.enemies)
+
+        # Shoot stuff
+
+
+    def nextWave(self):
+        '''
+        Starts the next wave when all enemies are killed
+        '''
+        if len(self.enemies.sprites()) == 0:
+            # When all enemies are killed, start next wave
+            self.runthru_enemy = True
 
     def handlemousestate(self, (mx, my), mstate='N'):
         if mstate == 'U':
@@ -349,8 +433,12 @@ class GameState(State):
         if self.gm.drag != None and mstate == 'U':
             # If you've just placed down something from the menu...
             # ...and you didn't place it on top another tower
-            overlap = pygame.sprite.spritecollideany(self.gm.drag, self.towers)
-            if overlap == None:
+            overlap = False
+            for t in self.towers.sprites():
+                if t.rect.collidepoint(mx, my):
+                    overlap = True
+                    break
+            if not overlap:
                 t = towers.rTower(self.gm.drag)
                 t.rect.x = mx-25
                 t.rect.y = my-25

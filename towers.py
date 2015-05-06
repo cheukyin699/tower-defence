@@ -26,6 +26,9 @@ class Tower(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+def getDist(a, b):
+    return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
+
 class rTower(pygame.sprite.Sprite):
     '''
     The tower displayed that does the actual fighting
@@ -47,7 +50,10 @@ class rTower(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = t.rect.x
         self.rect.y = t.rect.y
-        
+
+        self.reloading = 0
+        self.shoot = None
+
         '''
         Targeting:
         0: First (in range)
@@ -58,3 +64,21 @@ class rTower(pygame.sprite.Sprite):
         Defaults to First (0)
         '''
         self.target = 0
+
+    def update(self, enemies):
+        if self.reloading <= 0:
+            # If you have finished reloading
+            # Get list of enemies in range
+            enems_rng = []
+            for e in enemies.sprites():
+                dist = getDist(e.rect, self.rect)
+                if dist <= self.range:
+                    enems_rng.append([e, dist])
+
+            # Check for shooting target priority
+            if self.target == 0:
+                # Shoot the first
+                self.shoot = [enems_rng[0].rect.centerx,enems_rng[0].rect.centery]
+            self.reloading = self.rate
+        else:
+            self.reloading -= 1
