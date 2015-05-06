@@ -5,8 +5,24 @@
 import pygame
 import towers
 import enemy
+import bullet
+import math
 pygame.init()
 
+# FUNCTIONS
+def getVeloc(a, b, veloc):
+    '''
+    a: [x,y]
+    b: [x,y]
+    veloc: The velocity scalar
+    Returns list of 2 dimensions for a going to b
+    '''
+    # First, get angle (radians)
+    angle = math.atan((a[1]-b[1])/(a[0]-b[0]))
+    vx = -int(veloc*math.cos(angle))
+    vy = -int(veloc*math.sin(angle))
+    print math.degrees(angle)
+    return [vx,vy]
 
 # CLASSES
 class Mode:
@@ -334,6 +350,7 @@ class GameState(State):
         # All sprite groups
         self.towers = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.projectiles = pygame.sprite.Group()
         self.gm = GameMenu(self.surface, self.rmanager, self)
 
         # Some properties
@@ -354,6 +371,7 @@ class GameState(State):
 
         self.enemies.draw(self.surface)
         self.towers.draw(self.surface)
+        self.projectiles.draw(self.surface)
         self.gm.draw(self.surface)
 
         # Check for dragging something
@@ -397,9 +415,19 @@ class GameState(State):
             self.en_cd -= 1
         self.enemies.update()
         self.towers.update(self.enemies)
+        self.projectiles.update()
 
         # Shoot stuff
+        for t in self.towers.sprites():
+            # Find all towers that have things to shoot
+            if t.shoot != None and t.shoot != 'C':
+                # Spawn a bullet at some velocity
+                veloc = getVeloc((t.rect.centerx, t.rect.centery), t.shoot, t.shotveloc)
+                b = bullet.Bullet((t.rect.centerx, t.rect.centery), veloc)
+                self.projectiles.add(b)
 
+                # Reset tower shot to None
+                t.shoot = None
 
     def nextWave(self):
         '''

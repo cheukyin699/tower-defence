@@ -1,5 +1,6 @@
 import pygame
 import game
+import math
 
 class Tower(pygame.sprite.Sprite):
     '''
@@ -19,6 +20,7 @@ class Tower(pygame.sprite.Sprite):
         self.range = data['range']
         self.sprite = data['sprite']
         self.name = data['name']
+        self.shotveloc = data['shotveloc']
 
         costlbl = self.rmanager.fonts['monospace'].render('$'+str(self.cost), True, game.Color.yellow)
         self.image.blit(costlbl, (25-costlbl.get_rect().w/2,25-costlbl.get_rect().h/2))
@@ -46,6 +48,7 @@ class rTower(pygame.sprite.Sprite):
         self.range = t.range
         self.sprite = t.sprite
         self.name = t.name
+        self.shotveloc = t.shotveloc
 
         self.rect = self.image.get_rect()
         self.rect.x = t.rect.x
@@ -76,9 +79,10 @@ class rTower(pygame.sprite.Sprite):
                     enems_rng.append([e, dist])
 
             # Check for shooting target priority
-            if self.target == 0:
-                # Shoot the first
-                self.shoot = [enems_rng[0].rect.centerx,enems_rng[0].rect.centery]
-            self.reloading = self.rate
+            if len(enems_rng) >= 1:
+                if self.target == 0:
+                    # Shoot the first
+                    self.shoot = [enems_rng[0][0].rect.centerx,enems_rng[0][0].rect.centery]
+                self.reloading = self.rate
         else:
             self.reloading -= 1

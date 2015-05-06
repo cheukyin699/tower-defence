@@ -6,7 +6,8 @@
         	"name": "Gun Turret",
             "range": 150,
             "rate": 15,
-            "sprite": "gunturret"
+            "sprite": "gunturret",
+            "shotveloc": 20
         }
     },
 	"waves": [
