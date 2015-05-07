@@ -35,7 +35,7 @@ def getVeloc(a, b, veloc):
         vx = -vx
     elif b[0]-a[0]>0 and a[1]-b[1]<0:
         vy = -vy
-    print (math.degrees(angle), (b[0]-a[0]), a[1]-b[1], vx, vy)
+    #print (math.degrees(angle), (b[0]-a[0]), a[1]-b[1], vx, vy)
     return [vx,vy]
 
 # CLASSES
@@ -431,9 +431,10 @@ class GameState(State):
         # Projectile-enemy collision
         pe_col = pygame.sprite.groupcollide(self.projectiles, self.enemies, False, False)
         for k, d in pe_col.iteritems():
-            k.hp -= 1
             for item in d:
-                item.hp -= 1
+                if k.hp > 0:
+                    item.hp -= 1
+                    k.hp -= 1
 
         self.enemies.update()
         self.towers.update(self.enemies)
