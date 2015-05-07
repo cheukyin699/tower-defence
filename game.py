@@ -286,7 +286,7 @@ class GameMenu(pygame.sprite.Sprite):
 
         # Init towers
         ind = 0
-        for key, data in self.rmanager.data['towers'].iteritems():
+        for  data in self.rmanager.data['towers'].itervalues():
             t = towers.Tower(self.rmanager, data, (50*ind+100, 5))
             self.tlist.add(t)
             ind += 1
