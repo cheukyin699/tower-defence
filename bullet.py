@@ -14,7 +14,10 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.centery = pos[1]
 
         self.veloc = veloc
+        self.hp = 1
 
     def update(self):
+        if self.hp <= 0:
+            self.kill()
         self.rect.centerx += self.veloc[0]
         self.rect.centery += self.veloc[1]

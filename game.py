@@ -15,13 +15,27 @@ def getVeloc(a, b, veloc):
     a: [x,y]
     b: [x,y]
     veloc: The velocity scalar
+
+    Uses the 'brute force' method for turning the angles.
+
     Returns list of 2 dimensions for a going to b
     '''
     # First, get angle (radians)
-    angle = math.atan((a[1]-b[1])/(a[0]-b[0]))
-    vx = -int(veloc*math.cos(angle))
-    vy = -int(veloc*math.sin(angle))
-    print math.degrees(angle)
+    if b[0]-a[0] == 0:
+        angle = 0
+    else:
+        angle = math.atan(float(a[1]-b[1])/(b[0]-a[0]))
+    vx = int(veloc*math.cos(angle))
+    vy = int(veloc*math.sin(angle))
+    if b[0]-a[0]>0 and a[1]-b[1]>0:
+        vy = -vy
+    elif b[0]-a[0]<0 and a[1]-b[1]>0:
+        vx = -vx
+    elif b[0]-a[0]<0 and a[1]-b[1]<0:
+        vx = -vx
+    elif b[0]-a[0]>0 and a[1]-b[1]<0:
+        vy = -vy
+    print (math.degrees(angle), (b[0]-a[0]), a[1]-b[1], vx, vy)
     return [vx,vy]
 
 # CLASSES
@@ -413,6 +427,14 @@ class GameState(State):
                 self.noen += 1
         elif self.en_cd > 0:
             self.en_cd -= 1
+
+        # Projectile-enemy collision
+        pe_col = pygame.sprite.groupcollide(self.projectiles, self.enemies, False, False)
+        for k, d in pe_col.iteritems():
+            k.hp -= 1
+            for item in d:
+                item.hp -= 1
+
         self.enemies.update()
         self.towers.update(self.enemies)
         self.projectiles.update()
