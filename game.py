@@ -435,6 +435,12 @@ class GameState(State):
                 if k.hp > 0:
                     item.hp -= 1
                     k.hp -= 1
+                    
+        # Enemy-End_wall collision
+        for e in self.enemies.sprites():
+            if e.rect.centerx > self.SIZE[0]:
+                self.lives -= e.hp
+                e.kill()
 
         self.enemies.update()
         self.towers.update(self.enemies)
