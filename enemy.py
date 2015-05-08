@@ -16,7 +16,7 @@ class Enemy(pygame.sprite.Sprite):
         # Set hit-points
         self.maxhp = hp
         self.hp = hp
-        
+
         # If killed, will drop this amount
         self.cost = cost
 

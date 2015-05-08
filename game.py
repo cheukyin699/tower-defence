@@ -36,6 +36,7 @@ def getVeloc(a, b, veloc):
     elif b[0]-a[0]>0 and a[1]-b[1]<0:
         vy = -vy
     return [vx,vy]
+
 def getAngle(a, b):
     '''
     a: [x,y]
