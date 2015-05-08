@@ -46,9 +46,11 @@ class Mode:
     errormsg = -1
     splash = 0
     menu = 1
-    playing = 2
-    config = 3
-    exiting = 4
+    freeplay = 2
+    sandbox = 3
+    multiplayer = 4
+    config = 5
+    exiting = 6
 
 class Color:
     '''
@@ -81,6 +83,26 @@ class Sprite(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.x = data['pos'][0]
             self.rect.y = data['pos'][1]
+        # If has visible(true on default)
+        if data.has_key('visible'):
+            self.visible = data['visible']
+        else:
+            self.visible = True
+        # If has group
+        if data.has_key('group'):
+            self.group = data['group']
+        else:
+            self.group = None
+        # If has size
+        if data.has_key('size'):
+            self.size = data['size']
+        else:
+            self.size = None
+
+    def draw(self, surface):
+        if self.visible:
+            surface.blit(self.image, (self.rect.x, self.rect.y))
+
 
 class Button(Sprite):
     def __init__(self, data, rmanager):
@@ -113,29 +135,36 @@ class Button(Sprite):
         self.cb(*self.cb_args)
 
     def draw(self, surface):
-        surface.blit(self.image, (self.rect.x, self.rect.y))
+        if self.visible:
+            surface.blit(self.image, (self.rect.x, self.rect.y))
 
     def update(self):
-        # If up
-        if self.state == 'U':
-            self.state = 'O'
-        self.image = self.rmanager.sprites[self.sname + '-' + self.state].copy()
-        label = self.rmanager.fonts['monospace'].render(self.text, False, Color.black)
-        labelrect = label.get_rect()
-        self.image.blit(label, (self.rect.w/2-labelrect.w/2, self.rect.h/2-labelrect.h/2))
+        if self.visible:
+            # If up
+            if self.state == 'U':
+                self.state = 'O'
+            self.image = self.rmanager.sprites[self.sname + '-' + self.state].copy()
+            if self.size:
+                # If you have specified the size for this
+                self.image = pygame.transform.scale(self.image, self.size)
+                x,y = self.rect.x, self.rect.y
+                self.rect = self.image.get_rect()
+                self.rect.x = x
+                self.rect.y = y
+            label = self.rmanager.fonts['monospace'].render(self.text, False, Color.black)
+            labelrect = label.get_rect()
+            self.image.blit(label, (self.rect.w/2-labelrect.w/2, self.rect.h/2-labelrect.h/2))
 
-        # If clicked
-        if self.state == 'P' and self.cb:
-            self.do_callback()
-            
-        # If hovered
-        if self.state == 'O' and self.sound and not self.played:
-            self.rmanager.sounds[self.sound].play()
-            self.played = True
-            
-        # If normal
-        if self.state == 'N':
-            self.played = False
+            # If clicked
+            if self.state == 'P' and self.cb:
+                self.do_callback()
+            # If hovered
+            if self.state == 'O' and self.sound and not self.played:
+                self.rmanager.sounds[self.sound].play()
+                self.played = True
+            # If normal
+            if self.state == 'N':
+                self.played = False
 
 class State:
     '''
@@ -217,7 +246,13 @@ class MenuState(State):
             if data['type'] == 'button':
                 bt = Button(data, rmanager)
                 if key == 'play-bt':
-                    bt.callback(self.changestate, Mode.playing)
+                    bt.callback(self.tog_play_menu)
+                elif key == 'freeplay-bt':
+                    bt.callback(self.changestate, Mode.freeplay)
+                elif key == 'sandbox-bt':
+                    bt.callback(self.changestate, Mode.sandbox)
+                elif key == 'multiplayer-bt':
+                    bt.callback(self.changestate, Mode.multiplayer)
                 elif key == 'quit-bt':
                     bt.callback(self.changestate, Mode.exiting)
                 self.sprites.add(bt)
@@ -226,6 +261,15 @@ class MenuState(State):
                 self.bg = s
             else:
                 self.sprites.add(Sprite(data, rmanager))
+
+    def tog_play_menu(self):
+        '''
+        Toggles the play menu when you click the
+        play button
+        '''
+        for s in self.sprites.sprites():
+            if s.group == 'play':
+                s.visible = not s.visible
 
     def handlemousestate(self, (mx, my), mstate='N'):
         '''
@@ -243,7 +287,8 @@ class MenuState(State):
         self.surface.fill(Color.black)
 
         self.surface.blit(self.bg.image, (0, 0))
-        self.sprites.draw(self.surface)
+        for s in self.sprites.sprites():
+            s.draw(self.surface)
 
     def update(self):
         self.sprites.update()
@@ -314,8 +359,8 @@ class GameMenu(pygame.sprite.Sprite):
             # If you are dragging
             if self.drag != None:
                 mp = list(pygame.mouse.get_pos())
-                mp[0] -= 25
-                mp[1] -= 25
+                mp[0] -= self.drag.rect.w/2
+                mp[1] -= self.drag.rect.h/2
                 surface.blit(self.drag.orgimage, mp)
 
             # Update play button
@@ -358,8 +403,8 @@ class GameState(State):
     '''
     The class for handling the playing state
     '''
-    def __init__(self, surface, rmanager):
-        State.__init__(self, surface, rmanager, state=Mode.playing)
+    def __init__(self, surface, rmanager, state):
+        State.__init__(self, surface, rmanager, state=state)
 
         # All sprite groups
         self.towers = pygame.sprite.Group()
@@ -403,11 +448,11 @@ class GameState(State):
             col = (50,50,50,75)
             if overlap:
                 col = (200,0,0,75)
-            mp[0] -= 25
-            mp[1] -= 25
+            mp[0] -= self.gm.drag.rect.w/2
+            mp[1] -= self.gm.drag.rect.h/2
             # Draw circle with alpha
             pygame.draw.circle(rngcircle, col, (self.gm.drag.range, self.gm.drag.range), self.gm.drag.range)
-            self.surface.blit(rngcircle, (mp[0]-self.gm.drag.range+25, mp[1]-self.gm.drag.range+25))
+            self.surface.blit(rngcircle, (mp[0]-self.gm.drag.range+self.gm.drag.rect.w/2, mp[1]-self.gm.drag.range+self.gm.drag.rect.h/2))
             self.surface.blit(self.gm.drag.orgimage, mp)
 
     def update(self):
@@ -497,8 +542,8 @@ class GameState(State):
                     break
             if not overlap:
                 t = towers.rTower(self.gm.drag)
-                t.rect.x = mx-25
-                t.rect.y = my-25
+                t.rect.x = mx-t.rect.w/2
+                t.rect.y = my-t.rect.h/2
                 self.towers.add(t)
                 self.gm.drag = None
                 # TAKE YO MONEY

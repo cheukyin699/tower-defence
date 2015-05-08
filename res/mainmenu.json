@@ -7,6 +7,39 @@
         "pos": [50, 200]
     },
 
+    "freeplay-bt": {
+        "type": "button",
+        "sprite": "Button1",
+        "text": "Freeplay Mode",
+        "sound": "wood-click",
+        "visible": false,
+        "group": "play",
+        "size": [150, 30],
+        "pos": [200, 200]
+    },
+
+    "sandbox-bt": {
+        "type": "button",
+        "sprite": "Button1",
+        "text": "Sandbox Mode",
+        "sound": "wood-click",
+        "visible": false,
+        "group": "play",
+        "size": [150, 30],
+        "pos": [360, 200]
+    },
+
+    "multiplayer-bt": {
+        "type": "button",
+        "sprite": "Button1",
+        "text": "Multiplayer Mode",
+        "sound": "wood-click",
+        "visible": false,
+        "group": "play",
+        "size": [150, 30],
+        "pos": [200, 250]
+    },
+
     "quit-bt": {
         "type": "button",
         "sprite": "Button1",

@@ -19,7 +19,7 @@
             "td-label":  [   0,  90, 224,  27],
 
             // Some towers
-            "gunturret": [   0, 117,  50,  50]
+            "gunturret": [   0, 117,  30,  34]
         }
     }
 }

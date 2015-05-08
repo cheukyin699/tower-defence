@@ -32,6 +32,7 @@ class Resources:
         '''
         # Monospace
         self.fonts['monospace'] = pygame.font.SysFont('monospace', 15)
+        self.fonts['monospace-small'] = pygame.font.SysFont('monospace', 10)
 
     def loadMusics(self):
         '''

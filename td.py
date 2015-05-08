@@ -102,9 +102,9 @@ while mode != game.Mode.exiting:
         if states[-1].state == game.Mode.menu:
             # Check for menu
             states.append(game.MenuState(surface, rmanager))
-        elif states[-1].state == game.Mode.playing:
+        elif states[-1].state == game.Mode.freeplay:
             # Check for playing
-            states.append(game.GameState(surface, rmanager))
+            states.append(game.GameState(surface, rmanager, game.Mode.freeplay))
         elif states[-1].state == game.Mode.exiting:
             # Check for exit
             pass
