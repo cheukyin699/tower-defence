@@ -22,7 +22,7 @@ class Tower(pygame.sprite.Sprite):
         self.name = data['name']
         self.shotveloc = data['shotveloc']
 
-        costlbl = self.rmanager.fonts['monospace'].render('$'+str(self.cost), True, game.Color.green)
+        costlbl = self.rmanager.fonts['monospace-small'].render('$'+str(self.cost), True, game.Color.green)
         #self.image.blit(costlbl, (25-costlbl.get_rect().w/2,25-costlbl.get_rect().h/2))
         self.image.blit(costlbl, (0,0))
         self.rect = self.image.get_rect()
