@@ -1,6 +1,6 @@
 import pygame
-import game
 import math
+import game
 
 class Tower(pygame.sprite.Sprite):
     '''

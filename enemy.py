@@ -1,9 +1,9 @@
 import pygame
-import game
 import math
+import game
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, hp=1):
+    def __init__(self, hp=1, cost=1):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.surface.Surface((30,30))
@@ -16,9 +16,13 @@ class Enemy(pygame.sprite.Sprite):
         # Set hit-points
         self.maxhp = hp
         self.hp = hp
+        
+        # If killed, will drop this amount
+        self.cost = cost
 
-    def update(self):
+    def update(self, gs):
         if self.hp <= 0:
+            gs.money += self.cost
             self.kill()
         self.rect.centerx += 1
         self.rect.centery = 150*math.sin(math.radians(self.rect.centerx%360))+200

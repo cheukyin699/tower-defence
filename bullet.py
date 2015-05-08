@@ -1,6 +1,5 @@
 import pygame
 import game
-import math
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, veloc):

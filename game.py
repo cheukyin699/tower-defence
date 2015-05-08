@@ -442,7 +442,7 @@ class GameState(State):
                 self.lives -= e.hp
                 e.kill()
 
-        self.enemies.update()
+        self.enemies.update(self)
         self.towers.update(self.enemies)
         self.projectiles.update()
 
