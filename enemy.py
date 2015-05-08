@@ -18,7 +18,7 @@ class Enemy(pygame.sprite.Sprite):
         self.hp = hp
 
         # If killed, will drop this amount
-        self.cost = cost
+        self.cost = self.hp*5
 
     def update(self, gs):
         if self.hp <= 0:

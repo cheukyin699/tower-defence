@@ -492,6 +492,8 @@ class GameState(State):
                     self.en_cd = 15
                 else:
                     self.enemies.add(enemy.Enemy(enno))
+                    # Still wait 3 ticks
+                    self.en_cd = 3
                 self.noen += 1
         elif self.en_cd > 0:
             self.en_cd -= 1
@@ -503,7 +505,7 @@ class GameState(State):
                 if k.hp > 0:
                     item.hp -= 1
                     k.hp -= 1
-                    
+
         # Enemy-End_wall collision
         for e in self.enemies.sprites():
             if e.rect.centerx > self.SIZE[0]:
