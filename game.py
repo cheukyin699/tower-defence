@@ -35,8 +35,30 @@ def getVeloc(a, b, veloc):
         vx = -vx
     elif b[0]-a[0]>0 and a[1]-b[1]<0:
         vy = -vy
-    #print (math.degrees(angle), (b[0]-a[0]), a[1]-b[1], vx, vy)
     return [vx,vy]
+def getAngle(a, b):
+    '''
+    a: [x,y]
+    b: [x,y]
+
+    Uses the 'brute force' method for turning the angles.
+
+    Returns the angle
+    '''
+    # First, get relative angle (radians)
+    if b[0]-a[0] == 0:
+        angle = 0
+    else:
+        angle = math.degrees(math.atan(float(a[1]-b[1])/(b[0]-a[0])))
+    if b[0]-a[0]>0 and a[1]-b[1]>0:
+        angle -= 90
+    elif b[0]-a[0]<0 and a[1]-b[1]>0:
+        angle += 90
+    elif b[0]-a[0]<0 and a[1]-b[1]<0:
+        angle += 90
+    elif b[0]-a[0]>0 and a[1]-b[1]<0:
+        angle -= 90
+    return angle
 
 # CLASSES
 class Mode:
