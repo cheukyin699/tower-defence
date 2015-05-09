@@ -21,6 +21,7 @@
             // Some towers
             "gunturret": [   0, 117,  30,  34],
             "missturret":[  30, 117,  29,  27],
+            "sniperturret": [59,117,  30,  50],
             
             // Some FX
             "explosion": [ 250,   0,  98,  91]

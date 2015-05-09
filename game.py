@@ -601,7 +601,7 @@ class GameState(State):
                     overlap = True
                     break
             if not overlap:
-                t = towers.rTower(self.gm.drag)
+                t = self.gm.drag.tower(self.gm.drag)
                 t.rect.x = mx-t.rect.w/2
                 t.rect.y = my-t.rect.h/2
                 self.towers.add(t)

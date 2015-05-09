@@ -31,6 +31,17 @@ class Tower(pygame.sprite.Sprite):
 
         costlbl = pygame.transform.scale(costlbl, (self.rect.w, costlbl.get_rect().h))
         self.image.blit(costlbl, (0,0))
+        
+        # What tower is this going to become?
+        if self.sprite == 'gunturret':
+            self.projectile = bullet.Bullet
+            self.tower = rTower
+        elif self.sprite == 'missturret':
+            self.projectile = bullet.Missile
+            self.tower = rTower
+        elif self.sprite == 'sniperturret':
+            self.projectile = None
+            self.tower = SniperTower
 
 def getDist(a, b):
     return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
@@ -81,6 +92,8 @@ class rTower(pygame.sprite.Sprite):
             self.projectile = bullet.Bullet
         elif self.sprite == 'missturret':
             self.projectile = bullet.Missile
+        elif self.sprite == 'sniperturret':
+            self.projectile = None
 
     def update(self, enemies):
         if self.reloading <= 0:
@@ -101,6 +114,31 @@ class rTower(pygame.sprite.Sprite):
                     self.angle = game.getAngle((self.rect.centerx, self.rect.centery), self.shoot)
                     self.image = pygame.transform.rotate(self.rmanager.sprites[self.sprite].copy(), self.angle)
                     # Change rects
+                    x, y = self.rect.centerx, self.rect.centery
+                    self.rect = self.image.get_rect()
+                    self.rect.centerx, self.rect.centery = x, y
+                self.reloading = self.rate
+        else:
+            self.reloading -= 1
+
+class SniperTower(rTower):
+    def __init__(self, t):
+        rTower.__init__(self, t)
+        
+    def update(self, enemies):
+        if self.reloading <= 0:
+            # Finished sniper reloading
+            # Just attack (no need for range)
+            if len(enemies) > 0:
+                if self.target == 0:
+                    # Shoot the first in line
+                    self.shoot = 'C'
+                    e = enemies[0]
+                    self.angle = game.getAngle((self.rect.centerx, self.rect.centery), (e.rect.centerx, e.rect.centery))
+                    self.image = pygame.transform.rotate(self.rmanager.sprites[self.sprite].copy(), self.angle)
+                    # Attack
+                    e.hp -= self.dmg
+                    # Rect changing
                     x, y = self.rect.centerx, self.rect.centery
                     self.rect = self.image.get_rect()
                     self.rect.centerx, self.rect.centery = x, y
