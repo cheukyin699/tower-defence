@@ -61,6 +61,15 @@ def getAngle(a, b):
         angle -= 90
     return angle
 
+def getDist(a, b):
+    '''
+    a: rect
+    b: rect
+    
+    Returns the straight line distance between the 2 points
+    '''
+    return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
+
 # CLASSES
 class Mode:
     '''
@@ -126,6 +135,21 @@ class Sprite(pygame.sprite.Sprite):
         if self.visible:
             surface.blit(self.image, (self.rect.x, self.rect.y))
 
+class Explosion(Sprite):
+    def __init__(self, data, rmanager):
+        Sprite.__init__(self, data, rmanager)
+        
+        # Set pos in middle
+        self.rect.centerx = data['pos'][0]
+        self.rect.centery = data['pos'][1]
+        
+        self.life = data['life']
+        
+    def update(self):
+        if self.life <= 0:
+            self.kill()
+        else:
+            self.life -= 1
 
 class Button(Sprite):
     def __init__(self, data, rmanager):
@@ -433,6 +457,7 @@ class GameState(State):
         self.towers = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
+        self.fx = pygame.sprite.Group()
         self.gm = GameMenu(self.surface, self.rmanager, self)
 
         # Some properties
@@ -454,6 +479,7 @@ class GameState(State):
         self.enemies.draw(self.surface)
         self.towers.draw(self.surface)
         self.projectiles.draw(self.surface)
+        self.fx.draw(self.surface)
         self.gm.draw(self.surface)
 
         # Check for dragging something
@@ -501,10 +527,7 @@ class GameState(State):
         # Projectile-enemy collision
         pe_col = pygame.sprite.groupcollide(self.projectiles, self.enemies, False, False)
         for k, d in pe_col.iteritems():
-            for item in d:
-                if k.hp > 0:
-                    item.hp -= 1
-                    k.hp -= 1
+            k.hit(self, d)
 
         # Enemy-End_wall collision
         for e in self.enemies.sprites():
@@ -514,7 +537,8 @@ class GameState(State):
 
         self.enemies.update(self)
         self.towers.update(self.enemies)
-        self.projectiles.update()
+        self.projectiles.update(self.SIZE)
+        self.fx.update()
 
         # Shoot stuff
         for t in self.towers.sprites():
@@ -522,7 +546,7 @@ class GameState(State):
             if t.shoot != None and t.shoot != 'C':
                 # Spawn a bullet at some velocity
                 veloc = getVeloc((t.rect.centerx, t.rect.centery), t.shoot, t.shotveloc)
-                b = bullet.Bullet((t.rect.centerx, t.rect.centery), veloc)
+                b = t.projectile((t.rect.centerx, t.rect.centery), veloc, t.dmg, 1)
                 self.projectiles.add(b)
 
                 # Reset tower shot to None

@@ -1,6 +1,7 @@
 import pygame
 import math
 import game
+import bullet
 
 class Tower(pygame.sprite.Sprite):
     '''
@@ -71,6 +72,15 @@ class rTower(pygame.sprite.Sprite):
         Defaults to First (0)
         '''
         self.target = 0
+        
+        '''
+        Now, for the type of projectile (if any)
+        that this tower would shoot
+        '''
+        if self.sprite == 'gunturret':
+            self.projectile = bullet.Bullet
+        elif self.sprite == 'missturret':
+            self.projectile = bullet.Missile
 
     def update(self, enemies):
         if self.reloading <= 0:

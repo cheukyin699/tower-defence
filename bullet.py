@@ -2,7 +2,7 @@ import pygame
 import game
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, pos, veloc):
+    def __init__(self, pos, veloc, dmg, hp):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.surface.Surface((10,10))
@@ -13,10 +13,44 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.centery = pos[1]
 
         self.veloc = veloc
-        self.hp = 1
+        self.hp = hp
+        self.dmg = dmg
 
-    def update(self):
-        if self.hp <= 0:
+    def update(self, size):
+        if self.hp <= 0 or\
+        (self.rect.centerx < 0 or self.rect.centery < 0 or self.rect.centerx > size[0] or self.rect.centery > size[1]):
             self.kill()
         self.rect.centerx += self.veloc[0]
         self.rect.centery += self.veloc[1]
+
+    def hit(self, gs, enem):
+        for e in enem:
+            if self.hp > 0 and e.hp > 0:
+                e.hp -= self.dmg
+                self.hp -= 1
+            elif e.hp > 0:
+                continue
+            else:
+                break
+
+class Missile(Bullet):
+    def __init__(self, pos, veloc, dmg, hp):
+        Bullet.__init__(self, pos, veloc, 1, 1)
+
+        # The explosion radius
+        self.exp_rad = 50
+        
+    def hit(self, gs, enem):
+        for e in gs.enemies.sprites():
+            dist = game.getDist(self.rect, e.rect)
+            if dist <= self.exp_rad and e.hp > 0:
+                e.hp -= self.dmg
+        # Add special effects
+        data = {"type": "sprite", "sprite": "explosion", "text": '', "size": [self.exp_rad*2, self.exp_rad*2],
+                "pos": [self.rect.centerx,self.rect.centery], "life": 10}
+        gs.fx.add(game.Explosion(data, gs.rmanager))
+        # You have already exploded (died)
+        self.hp = 0
+
+    def update(self, size):
+        Bullet.update(self, size)
