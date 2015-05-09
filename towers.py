@@ -87,7 +87,7 @@ class rTower(pygame.sprite.Sprite):
             # If you have finished reloading
             # Get list of enemies in range
             enems_rng = []
-            for e in enemies.sprites():
+            for e in enemies:
                 dist = getDist(e.rect, self.rect)
                 if dist <= self.range:
                     enems_rng.append([e, dist])

@@ -31,3 +31,6 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.surface.Surface((30,30))
         pygame.draw.circle(self.image, game.Color.white, (15,15), 15)
         pygame.draw.rect(self.image, game.Color.green, (0,0,self.rect.w*self.hp/self.maxhp,5))
+
+    def draw(self, surface):
+        surface.blit(self.image, (self.rect.centerx, self.rect.centery))

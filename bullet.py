@@ -24,14 +24,9 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.centery += self.veloc[1]
 
     def hit(self, gs, enem):
-        for e in enem:
-            if self.hp > 0 and e.hp > 0:
-                e.hp -= self.dmg
-                self.hp -= 1
-            elif e.hp > 0:
-                continue
-            else:
-                break
+        if self.hp > 0 and enem.hp > 0:
+            enem.hp -= self.dmg
+            self.hp -= 1
 
 class Missile(Bullet):
     def __init__(self, pos, veloc, dmg, hp):
@@ -41,7 +36,7 @@ class Missile(Bullet):
         self.exp_rad = 50
         
     def hit(self, gs, enem):
-        for e in gs.enemies.sprites():
+        for e in gs.enemies:
             dist = game.getDist(self.rect, e.rect)
             if dist <= self.exp_rad and e.hp > 0:
                 e.hp -= self.dmg

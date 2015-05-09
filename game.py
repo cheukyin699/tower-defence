@@ -455,7 +455,7 @@ class GameState(State):
 
         # All sprite groups
         self.towers = pygame.sprite.Group()
-        self.enemies = pygame.sprite.Group()
+        self.enemies = []
         self.projectiles = pygame.sprite.Group()
         self.fx = pygame.sprite.Group()
         self.gm = GameMenu(self.surface, self.rmanager, self)
@@ -476,7 +476,8 @@ class GameState(State):
     def draw(self):
         self.surface.fill(Color.black)
 
-        self.enemies.draw(self.surface)
+        for i in xrange(len(self.enemies)):
+            self.enemies[i].draw(self.surface)
         self.towers.draw(self.surface)
         self.projectiles.draw(self.surface)
         self.fx.draw(self.surface)
@@ -517,7 +518,7 @@ class GameState(State):
                     # WAIT FOR TICKS (15)
                     self.en_cd = 15
                 else:
-                    self.enemies.add(enemy.Enemy(enno))
+                    self.enemies.append(enemy.Enemy(enno))
                     # Still wait 3 ticks
                     self.en_cd = 3
                 self.noen += 1
@@ -525,17 +526,27 @@ class GameState(State):
             self.en_cd -= 1
 
         # Projectile-enemy collision
+        '''
         pe_col = pygame.sprite.groupcollide(self.projectiles, self.enemies, False, False)
         for k, d in pe_col.iteritems():
             k.hit(self, d)
+        '''
 
-        # Enemy-End_wall collision
-        for e in self.enemies.sprites():
+        # Enemy
+        for e in self.enemies:
+            pe = pygame.sprite.spritecollide(e, self.projectiles, False)
+            if len(pe) > 0:
+                # If you collided with projectile
+                for p in pe:
+                    p.hit(self, e)
             if e.rect.centerx > self.SIZE[0]:
                 self.lives -= e.hp
-                e.kill()
+                self.enemies.remove(e)
+            else:
+                e.update(self)
+            if e.hp <= 0:
+                self.enemies.remove(e)
 
-        self.enemies.update(self)
         self.towers.update(self.enemies)
         self.projectiles.update(self.SIZE)
         self.fx.update()
@@ -556,7 +567,7 @@ class GameState(State):
         '''
         Starts the next wave when all enemies are killed
         '''
-        if len(self.enemies.sprites()) == 0:
+        if len(self.enemies) == 0:
             # When all enemies are killed, start next wave
             self.runthru_enemy = True
 
