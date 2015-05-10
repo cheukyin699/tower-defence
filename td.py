@@ -11,7 +11,7 @@ import game
 
 
 # Constants
-SIZE = 800, 500
+SIZE = 1200, 600
 
 
 
