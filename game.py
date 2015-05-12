@@ -6,7 +6,9 @@ import pygame
 import towers
 import enemy
 import bullet
+import jsonmaputils
 import math
+from jsonmaputils import TMXJsonMap
 pygame.init()
 
 # FUNCTIONS
@@ -459,6 +461,9 @@ class GameState(State):
         self.projectiles = pygame.sprite.Group()
         self.fx = pygame.sprite.Group()
         self.gm = GameMenu(self.surface, self.rmanager, self)
+        
+        # The backdrop
+        self.bg = TMXJsonMap('res/maps/grass-map1.json')
 
         # Some properties
         self.lives = 100
@@ -475,6 +480,9 @@ class GameState(State):
 
     def draw(self):
         self.surface.fill(Color.black)
+        
+        # Draw the background on first
+        self.surface.blit(self.bg.layers['background'].image, (0,0))
 
         for i in xrange(len(self.enemies)):
             self.enemies[i].draw(self.surface)
