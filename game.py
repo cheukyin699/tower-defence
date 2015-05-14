@@ -526,7 +526,9 @@ class GameState(State):
                     # WAIT FOR TICKS (15)
                     self.en_cd = 15
                 else:
-                    self.enemies.append(enemy.Enemy(enno))
+                    en = enemy.Enemy(enno)
+                    en.path = self.rmanager.data['maps']['grass-map1']['path']
+                    self.enemies.append(en)
                     # Still wait 3 ticks
                     self.en_cd = 3
                 self.noen += 1

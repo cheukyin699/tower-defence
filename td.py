@@ -14,7 +14,6 @@ import game
 SIZE = 1200, 600
 
 
-
 pygame.init()
 pygame.mixer.init()
 
@@ -24,9 +23,6 @@ surface = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 mode = game.Mode.splash
 states = []
-
-
-
 
 
 # Initializations
