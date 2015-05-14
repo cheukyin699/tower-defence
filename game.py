@@ -67,7 +67,7 @@ def getDist(a, b):
     '''
     a: rect
     b: rect
-    
+
     Returns the straight line distance between the 2 points
     '''
     return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
@@ -341,14 +341,14 @@ class MenuState(State):
 
     def update(self):
         self.sprites.update()
-        
+
 class GameMenu(pygame.sprite.Sprite):
     '''
     The class responsible for responding to
     clicks on the menu
     The in-game menu will be positioned on the
     bottom of the screen
-    
+
     Buttons that should be included:
     - Buy tower(s) selection
     - Upgrade menu
@@ -360,12 +360,14 @@ class GameMenu(pygame.sprite.Sprite):
         self.gs = gs
 
         self.tlist = pygame.sprite.Group()
-        
+        if self.gs.mode != game.Mode.freeplay:
+            self.elist = pygame.sprite.Group()
+
         self.image = pygame.surface.Surface((surface.get_rect().w, surface.get_rect().h*.25))
         self.image.fill(Color.white)
         self.rect = self.image.get_rect()
         self.rect.y = surface.get_rect().h*.75
-        
+
         # Have focus on selected tower. If focus is None,
         # menu displays normal menu stuff
         self.focus = None
@@ -374,16 +376,26 @@ class GameMenu(pygame.sprite.Sprite):
         self.drag = None
 
         # The play button (starts rounds)
-        self.play_bt = Button.sMade(type='button', text='Play', sprite='Button1', sound='wood-click',
-                pos=[self.rect.w*.75, 0], size=[80, self.rect.h], rmanager=self.rmanager)
-        self.play_bt.callback(self.gs.nextWave)
+        if self.gs.mode == freeplay:
+            self.play_bt = Button.sMade(type='button', text='Play', sprite='Button1', sound='wood-click',
+                    pos=[self.rect.w*.75, 0], size=[80, self.rect.h], rmanager=self.rmanager)
+            self.play_bt.callback(self.gs.nextWave)
 
         # Init towers
         ind = 0
-        for  data in self.rmanager.data['towers'].itervalues():
+        for data in self.rmanager.data['towers'].itervalues():
             t = towers.Tower(self.rmanager, data, (50*ind+100, 5))
             self.tlist.add(t)
             ind += 1
+
+        # Init enemies
+        if self.gs.mode != game.Mode.freeplay:
+            ind = 0
+            # It is an array, so it is different
+            for data in self.rmanager.data['enemies']:
+                e = enemy.bEnemy(self.rmanager, data, (50*ind+100, 55))
+                self.elist.add(e)
+                ind += 1
 
     def drawMoney(self):
         moneylbl = self.rmanager.fonts['monospace'].render("$"+str(self.gs.money), True, Color.green)
@@ -403,7 +415,10 @@ class GameMenu(pygame.sprite.Sprite):
         if self.focus == None:
             # Display the main game menu
             # Draw some other stuffs
+            # Draw towers
             self.tlist.draw(self.image)
+            # If in sandbox/multiplayer, draw enemies (to buy)
+            self.elist.draw(self.image)
 
             # If you are dragging
             if self.drag != None:
@@ -413,14 +428,16 @@ class GameMenu(pygame.sprite.Sprite):
                 surface.blit(self.drag.orgimage, mp)
 
             # Update play button
-            self.play_bt.update()
-            # Draw play button
-            self.play_bt.draw(self.image)
+            if self.gs.mode == game.Mode.freeplay:
+                self.play_bt.update()
+                # Draw play button
+                self.play_bt.draw(self.image)
         else:
             # If you have focused on some random tower,
             # display the upgrade menu
             namelbl = self.rmanager.fonts['monospace'].render(self.focus.name, True, Color.blue)
             self.image.blit(namelbl, (0, namelbl.get_rect().h*2))
+            '''
             # Draw the range (with some ALPHA)
             rngcircle = pygame.surface.Surface((self.focus.range*2, self.focus.range*2))
             rngcircle.set_alpha(150)
@@ -428,6 +445,9 @@ class GameMenu(pygame.sprite.Sprite):
             pygame.draw.circle(rngcircle, (50,50,50,75), (self.focus.range, self.focus.range), self.focus.range)
             # Blit the circle
             surface.blit(rngcircle, (self.focus.rect.centerx-self.focus.range, self.focus.rect.centery-self.focus.range))
+            '''
+            # Draw the range (without alpha)
+            pygame.draw.circle(surface, game.Color.white, (self.focus.range, self.focus.range), self.focus.range, 1)
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -461,7 +481,7 @@ class GameState(State):
         self.projectiles = pygame.sprite.Group()
         self.fx = pygame.sprite.Group()
         self.gm = GameMenu(self.surface, self.rmanager, self)
-        
+
         # The backdrop
         self.bg = TMXJsonMap('res/maps/grass-map1.json')
 
@@ -480,7 +500,7 @@ class GameState(State):
 
     def draw(self):
         self.surface.fill(Color.black)
-        
+
         # Draw the background on first
         self.surface.blit(self.bg.layers['background'].image, (0,0))
 
@@ -514,7 +534,7 @@ class GameState(State):
             self.surface.blit(self.gm.drag.orgimage, mp)
 
     def update(self):
-        if self.runthru_enemy and self.en_cd <= 0:
+        if self.runthru_enemy and self.en_cd <= 0 and self.mode != Mode.sandbox:
             if self.noen >= len(self.rmanager.data['waves'][self.wave]):
                 # If done spawning enemies
                 self.noen = 0
@@ -532,15 +552,8 @@ class GameState(State):
                     # Still wait 3 ticks
                     self.en_cd = 3
                 self.noen += 1
-        elif self.en_cd > 0:
+        elif self.en_cd > 0 and self.mode != Mode.sandbox:
             self.en_cd -= 1
-
-        # Projectile-enemy collision
-        '''
-        pe_col = pygame.sprite.groupcollide(self.projectiles, self.enemies, False, False)
-        for k, d in pe_col.iteritems():
-            k.hit(self, d)
-        '''
 
         # Enemy
         for e in self.enemies:

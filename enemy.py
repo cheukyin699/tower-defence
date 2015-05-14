@@ -2,6 +2,27 @@ import pygame
 import math
 import game
 
+class bEnemy(pygame.sprite.Sprite):
+    def __init__(self, rmanager, data, pos):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.rmanager = rmanager
+
+        self.image = self.rmanager.sprites[data['sprite']].copy()
+        self.orgimage = self.image.copy()
+        self.cost = data['cost']
+        self.sprite = data['sprite']
+        self.name = data['name']
+
+        costlbl = self.rmanager.fonts['monospace'].render('$'+str(self.cost), True, game.Color.green)
+        #self.image.blit(costlbl, (25-costlbl.get_rect().w/2,25-costlbl.get_rect().h/2))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+        costlbl = pygame.transform.scale(costlbl, (self.rect.w, costlbl.get_rect().h))
+        self.image.blit(costlbl, (0,0))
+
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, hp=1, cost=1):
         pygame.sprite.Sprite.__init__(self)
@@ -26,11 +47,12 @@ class Enemy(pygame.sprite.Sprite):
         self.path = []
 
         # If killed, will drop this amount
-        self.cost = self.hp*5
+        self.cost = self.hp*2
 
     def update(self, gs):
         if self.hp <= 0:
-            gs.money += self.cost
+            if gs.mode != game.Mode.sandbox:
+                gs.money += self.cost
             self.kill()
         ''' Old sin-wave pathing NO_MORE
         self.rect.centerx += 1

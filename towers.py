@@ -31,7 +31,7 @@ class Tower(pygame.sprite.Sprite):
 
         costlbl = pygame.transform.scale(costlbl, (self.rect.w, costlbl.get_rect().h))
         self.image.blit(costlbl, (0,0))
-        
+
         # What tower is this going to become?
         if self.sprite == 'gunturret':
             self.projectile = bullet.Bullet

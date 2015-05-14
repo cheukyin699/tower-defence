@@ -101,6 +101,9 @@ while mode != game.Mode.exiting:
         elif states[-1].state == game.Mode.freeplay:
             # Check for playing
             states.append(game.GameState(surface, rmanager, game.Mode.freeplay))
+        elif states[-1].state == game.Mode.sandbox:
+            # Check for sandbox mode
+            states.append(game.GameState(surface, rmanager, game.Mode.sandbox))
         elif states[-1].state == game.Mode.exiting:
             # Check for exit
             pass
