@@ -360,7 +360,7 @@ class GameMenu(pygame.sprite.Sprite):
         self.gs = gs
 
         self.tlist = pygame.sprite.Group()
-        if self.gs.mode != game.Mode.freeplay:
+        if self.gs.state != Mode.freeplay:
             self.elist = pygame.sprite.Group()
 
         self.image = pygame.surface.Surface((surface.get_rect().w, surface.get_rect().h*.25))
@@ -376,7 +376,7 @@ class GameMenu(pygame.sprite.Sprite):
         self.drag = None
 
         # The play button (starts rounds)
-        if self.gs.mode == freeplay:
+        if self.gs.state == Mode.freeplay:
             self.play_bt = Button.sMade(type='button', text='Play', sprite='Button1', sound='wood-click',
                     pos=[self.rect.w*.75, 0], size=[80, self.rect.h], rmanager=self.rmanager)
             self.play_bt.callback(self.gs.nextWave)
@@ -389,7 +389,7 @@ class GameMenu(pygame.sprite.Sprite):
             ind += 1
 
         # Init enemies
-        if self.gs.mode != game.Mode.freeplay:
+        if self.gs.state != Mode.freeplay:
             ind = 0
             # It is an array, so it is different
             for data in self.rmanager.data['enemies']:
@@ -418,7 +418,8 @@ class GameMenu(pygame.sprite.Sprite):
             # Draw towers
             self.tlist.draw(self.image)
             # If in sandbox/multiplayer, draw enemies (to buy)
-            self.elist.draw(self.image)
+            if self.gs.state != Mode.freeplay:
+                self.elist.draw(self.image)
 
             # If you are dragging
             if self.drag != None:
@@ -428,7 +429,7 @@ class GameMenu(pygame.sprite.Sprite):
                 surface.blit(self.drag.orgimage, mp)
 
             # Update play button
-            if self.gs.mode == game.Mode.freeplay:
+            if self.gs.state == Mode.freeplay:
                 self.play_bt.update()
                 # Draw play button
                 self.play_bt.draw(self.image)
@@ -437,17 +438,8 @@ class GameMenu(pygame.sprite.Sprite):
             # display the upgrade menu
             namelbl = self.rmanager.fonts['monospace'].render(self.focus.name, True, Color.blue)
             self.image.blit(namelbl, (0, namelbl.get_rect().h*2))
-            '''
-            # Draw the range (with some ALPHA)
-            rngcircle = pygame.surface.Surface((self.focus.range*2, self.focus.range*2))
-            rngcircle.set_alpha(150)
-            # Draw the circle
-            pygame.draw.circle(rngcircle, (50,50,50,75), (self.focus.range, self.focus.range), self.focus.range)
-            # Blit the circle
-            surface.blit(rngcircle, (self.focus.rect.centerx-self.focus.range, self.focus.rect.centery-self.focus.range))
-            '''
             # Draw the range (without alpha)
-            pygame.draw.circle(surface, game.Color.white, (self.focus.range, self.focus.range), self.focus.range, 1)
+            pygame.draw.circle(surface, Color.white, (self.focus.rect.centerx,self.focus.rect.centery), self.focus.range, 1)
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -514,27 +506,22 @@ class GameState(State):
         # Check for dragging something
         if self.gm.drag != None:
             mp = list(pygame.mouse.get_pos())
-            # Draw the range first (with some ALPHA)
-            rngcircle = pygame.surface.Surface((self.gm.drag.range*2, self.gm.drag.range*2))
-            rngcircle.set_alpha(150)
-            # Check for overlapping
+            # Draw the range without ALPHA
             overlap = False
             for t in self.towers.sprites():
                 if t.rect.collidepoint(mp[0], mp[1]):
                     overlap = True
                     break
-            col = (50,50,50,75)
+            col = Color.white
             if overlap:
-                col = (200,0,0,75)
+                col = Color.red
+            pygame.draw.circle(self.surface, col, (mp[0],mp[1]), self.gm.drag.range, 1)
             mp[0] -= self.gm.drag.rect.w/2
             mp[1] -= self.gm.drag.rect.h/2
-            # Draw circle with alpha
-            pygame.draw.circle(rngcircle, col, (self.gm.drag.range, self.gm.drag.range), self.gm.drag.range)
-            self.surface.blit(rngcircle, (mp[0]-self.gm.drag.range+self.gm.drag.rect.w/2, mp[1]-self.gm.drag.range+self.gm.drag.rect.h/2))
             self.surface.blit(self.gm.drag.orgimage, mp)
 
     def update(self):
-        if self.runthru_enemy and self.en_cd <= 0 and self.mode != Mode.sandbox:
+        if self.runthru_enemy and self.en_cd <= 0 and self.state != Mode.sandbox:
             if self.noen >= len(self.rmanager.data['waves'][self.wave]):
                 # If done spawning enemies
                 self.noen = 0
@@ -552,7 +539,7 @@ class GameState(State):
                     # Still wait 3 ticks
                     self.en_cd = 3
                 self.noen += 1
-        elif self.en_cd > 0 and self.mode != Mode.sandbox:
+        elif self.en_cd > 0 and self.state != Mode.sandbox:
             self.en_cd -= 1
 
         # Enemy

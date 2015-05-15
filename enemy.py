@@ -17,8 +17,8 @@ class bEnemy(pygame.sprite.Sprite):
         costlbl = self.rmanager.fonts['monospace'].render('$'+str(self.cost), True, game.Color.green)
         #self.image.blit(costlbl, (25-costlbl.get_rect().w/2,25-costlbl.get_rect().h/2))
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
 
         costlbl = pygame.transform.scale(costlbl, (self.rect.w, costlbl.get_rect().h))
         self.image.blit(costlbl, (0,0))
@@ -51,13 +51,9 @@ class Enemy(pygame.sprite.Sprite):
 
     def update(self, gs):
         if self.hp <= 0:
-            if gs.mode != game.Mode.sandbox:
+            if gs.state != game.Mode.sandbox:
                 gs.money += self.cost
             self.kill()
-        ''' Old sin-wave pathing NO_MORE
-        self.rect.centerx += 1
-        self.rect.centery = 150*math.sin(math.radians(self.rect.centerx%360))+200
-        '''
         # New point-to-point pathing system
         if self.pathind == 0:
             # If you have just spawned in, then take you to the location pls
