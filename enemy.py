@@ -21,6 +21,7 @@ class bEnemy(pygame.sprite.Sprite):
         self.rmanager = rmanager
 
         self.image = self.rmanager.sprites[data['sprite']].copy()
+        self.image = pygame.transform.scale(self.image, (30, 30))
         self.orgimage = self.image.copy()
         self.cost = data['cost']
         self.eco = data['eco']
@@ -80,6 +81,7 @@ class Enemy(pygame.sprite.Sprite):
             if gs.state != game.Mode.sandbox:
                 gs.money += self.cost
             self.kill()
+
         # New point-to-point pathing system
         if self.pathind == 0:
             # If you have just spawned in, then take you to the location pls

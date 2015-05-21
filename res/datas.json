@@ -16,7 +16,7 @@
     		"hp": 1,
     		"name": "Blue Enemy",
     		"sprite": "blue_enemy",
-    		"speed": 1.5
+    		"speed": 2
     	},
     	{
             "eid": 2,
@@ -25,7 +25,7 @@
     		"hp": 1,
     		"name": "Green Enemy",
     		"sprite": "green_enemy",
-    		"speed": 2
+    		"speed": 2.5
     	}
     		
     ],
@@ -67,6 +67,7 @@
     	}
     },
 	"waves": [
-		["20x0"]
+		["20x0", "T:25", "20x1", "T:50"],
+        ["T:10", "50x0", "50x1", "T:5", "10x2", "T:50"]
 	]
 }

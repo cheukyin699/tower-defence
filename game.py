@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # File: game.py
 # Description: Provides useful classes and functions for the game
 
@@ -391,16 +390,22 @@ class GameMenu(pygame.sprite.Sprite):
             ind = 0
             # It is an array, so it is different
             for data in self.rmanager.data['enemies']:
-                e = enemy.bEnemy(self.rmanager, data, (50*ind+100, 55))
+                e = enemy.bEnemy(self.rmanager, data, (30*ind+100, 55))
                 self.elist.add(e)
                 ind += 1
 
     def drawMoney(self):
-        moneylbl = self.rmanager.fonts['monospace'].render("$"+str(self.gs.money), True, Color.green)
+        text = "$" + str(self.gs.money)
+        if self.gs.state == Mode.sandbox:
+            text = "$$$$"
+        moneylbl = self.rmanager.fonts['monospace'].render(text, True, Color.green)
         self.image.blit(moneylbl, (0,0))
 
     def drawLives(self):
-        liveslbl = self.rmanager.fonts['monospace'].render("LF:"+str(self.gs.lives), False, Color.red)
+        text = "LF:" + str(self.gs.lives)
+        if self.gs.state == Mode.sandbox:
+            text = "<3<3"
+        liveslbl = self.rmanager.fonts['monospace'].render(text, False, Color.red)
         self.image.blit(liveslbl, (0, liveslbl.get_rect().h))
 
     def draw(self, surface):
@@ -498,6 +503,8 @@ class GameState(State):
         self.runthru_enemy = False
         # Timer
         self.en_cd = 0
+        # Crowd density
+        self.density = 50
 
         # TODO: Grab the current map
         self.currentmap = "grass-map1"
@@ -546,13 +553,19 @@ class GameState(State):
                 self.enemies.append(en)
                 # Subtract from enem_on[0]
                 self.enem_on[0] -= 1
-                # Wait 3 ticks
-                self.en_cd = 3
+                # Wait 50 ticks
+                self.en_cd = self.density
             else:
                 enno = self.rmanager.data['waves'][self.wave][self.noen].split('x')
-                # Set the spawn buffer
-                self.enem_on = [int(enno[0]), int(enno[1])]
-                self.noen += 1
+                ttime = self.rmanager.data['waves'][self.wave][self.noen].split(':')
+                if len(enno) > 1:
+                    # Set the spawn buffer
+                    self.enem_on = [int(enno[0]), int(enno[1])]
+                    self.noen += 1
+                elif len(ttime) > 1:
+                    if ttime[0] == 'T':
+                        self.density = int(ttime[1])
+                    self.noen += 1
         elif self.en_cd > 0 and self.state != Mode.sandbox:
             self.en_cd -= 1
 
@@ -564,7 +577,8 @@ class GameState(State):
                 for p in pe:
                     p.hit(self, e)
             if e.rect.centerx > self.SIZE[0]:
-                self.lives -= e.hp
+                if self.state != Mode.sandbox:
+                    self.lives -= e.hp
                 self.enemies.remove(e)
             else:
                 e.update(self)
