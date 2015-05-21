@@ -1,5 +1,30 @@
 {
     "enemies": [
+    	{
+    		"cost": 25,
+    		"eco": 1,
+    		"hp": 1,
+    		"name": "Red Enemy",
+    		"sprite": "red_enemy",
+    		"speed": 1
+    	},
+    	{
+    		"cost": 25,
+    		"eco": 1,
+    		"hp": 1,
+    		"name": "Blue Enemy",
+    		"sprite": "blue_enemy",
+    		"speed": 1.5
+    	},
+    	{
+    		"cost": 30,
+    		"eco": 1.5,
+    		"hp": 1,
+    		"name": "Green Enemy",
+    		"sprite": "green_enemy",
+    		"speed": 2
+    	}
+    		
     ],
     "towers": {
         "gun-turret": {
@@ -12,7 +37,7 @@
             "shotveloc": 20
         },
         "missile-turret": {
-        	"cost": 600,
+        	"cost": 650,
         	"dmg": 1,
         	"name": "Missile Turret",
         	"range": 200,
@@ -39,9 +64,6 @@
     	}
     },
 	"waves": [
-		[1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 2, 2],
-		[2, 0, 2, 0, 2, 0, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-		[3,2,3,2,3,2,3,2,3,2,0,0,0,0,0,0,10,10,10,10],
-		[10,0,10,0,10,0,10,0,2,2,2,2,2,2,2]
+		["20x0"]
 	]
 }

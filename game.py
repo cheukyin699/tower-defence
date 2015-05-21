@@ -5,8 +5,6 @@
 import pygame
 import towers
 import enemy
-import bullet
-import jsonmaputils
 import math
 from jsonmaputils import TMXJsonMap
 pygame.init()
@@ -479,12 +477,14 @@ class GameState(State):
 
         # Some properties
         self.lives = 100
-        self.money = 1000
+        self.money = 650
 
         # The wave that you are currently on
         self.wave = 0
-        # The enemy that you are currently on
+        # The index of the wave that you are currently on
         self.noen = 0
+        # Count of enemies to spawn and enemy id
+        self.enem_on = [0,0]
         # Should I spawn enemies?
         self.runthru_enemy = False
         # Timer
@@ -522,22 +522,22 @@ class GameState(State):
 
     def update(self):
         if self.runthru_enemy and self.en_cd <= 0 and self.state != Mode.sandbox:
-            if self.noen >= len(self.rmanager.data['waves'][self.wave]):
+            if self.noen >= len(self.rmanager.data['waves'][self.wave]) and self.enem_on[0] <= 0:
                 # If done spawning enemies
+                # And you have cleared the enemy buffer
                 self.noen = 0
                 self.wave += 1
                 self.runthru_enemy = False
+            elif self.enem_on[0] > 0:
+                en = enemy.get_correct_enemy_type(self.enem_on[1])
+                en.path = self.rmanager.data['maps'][self.currentmap]['path']
+                self.enemies.append(en)
+                # Wait 3 ticks
+                self.en_cd = 3
             else:
-                enno = self.rmanager.data['waves'][self.wave][self.noen]
-                if enno == 0:
-                    # WAIT FOR TICKS (15)
-                    self.en_cd = 15
-                else:
-                    en = enemy.Enemy(enno)
-                    en.path = self.rmanager.data['maps']['grass-map1']['path']
-                    self.enemies.append(en)
-                    # Still wait 3 ticks
-                    self.en_cd = 3
+                enno = self.rmanager.data['waves'][self.wave][self.noen].split('x')
+                # Set the spawn buffer
+                self.enem_on = [int(enno[0]), int(enno[1])]
                 self.noen += 1
         elif self.en_cd > 0 and self.state != Mode.sandbox:
             self.en_cd -= 1

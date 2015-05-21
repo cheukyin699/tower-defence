@@ -1,6 +1,8 @@
 import pygame
-import math
 import game
+
+def get_correct_enemy_type(num):
+    pass
 
 class bEnemy(pygame.sprite.Sprite):
     def __init__(self, rmanager, data, pos):
@@ -11,11 +13,14 @@ class bEnemy(pygame.sprite.Sprite):
         self.image = self.rmanager.sprites[data['sprite']].copy()
         self.orgimage = self.image.copy()
         self.cost = data['cost']
+        self.eco = data['eco']
         self.sprite = data['sprite']
         self.name = data['name']
+        self.hp = data['hp']
+        self.maxhp = self.hp
+        self.speed = data['speed']
 
         costlbl = self.rmanager.fonts['monospace'].render('$'+str(self.cost), True, game.Color.green)
-        #self.image.blit(costlbl, (25-costlbl.get_rect().w/2,25-costlbl.get_rect().h/2))
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
@@ -24,22 +29,24 @@ class bEnemy(pygame.sprite.Sprite):
         self.image.blit(costlbl, (0,0))
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, hp=1, cost=1):
+    def __init__(self, e):
         pygame.sprite.Sprite.__init__(self)
+        
+        self.rmanager = e.rmanager
 
-        self.image = pygame.surface.Surface((30,30))
-        pygame.draw.circle(self.image, game.Color.white, (15,15), 15)
+        self.image = self.rmanager.sprites[e.sprite].copy()
+        self.sprite = e.sprite
 
         self.rect = self.image.get_rect()
         self.rect.centerx = 0
         self.rect.centery = 200
 
         # Set hit-points
-        self.maxhp = hp
-        self.hp = hp
+        self.maxhp = e.hp
+        self.hp = e.hp
 
         # Other important variables set here
-        self.speed = 3
+        self.speed = e.speed
         self.veloc = [0,0]
 
         # The path index
@@ -47,10 +54,12 @@ class Enemy(pygame.sprite.Sprite):
         self.path = []
 
         # If killed, will drop this amount
-        self.cost = self.hp*2
+        self.cost = self.hp
 
     def update(self, gs):
         if self.hp <= 0:
+            if self.child:
+                e = self.child(self)
             if gs.state != game.Mode.sandbox:
                 gs.money += self.cost
             self.kill()
@@ -71,10 +80,11 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.centerx += self.veloc[0]
         self.rect.centery += self.veloc[1]
 
-        # Blit the green health bar
-        self.image = pygame.surface.Surface((30,30))
-        pygame.draw.circle(self.image, game.Color.white, (15,15), 15)
-        pygame.draw.rect(self.image, game.Color.green, (0,0,self.rect.w*self.hp/self.maxhp,5))
-
     def draw(self, surface):
         surface.blit(self.image, (self.rect.centerx, self.rect.centery))
+
+class RedEnemy(Enemy):
+    def __init__(self, en):
+        Enemy.__init__(self, en)
+        
+        self.child = None

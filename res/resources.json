@@ -24,7 +24,12 @@
             "sniperturret": [59,117,  30,  50],
             
             // Some FX
-            "explosion": [ 250,   0,  98,  91]
+            "explosion": [ 250,   0,  98,  91],
+            
+            // Some enemies
+            "red_enemy": [   0, 170,  50,  50],
+            "blue_enemy":[  50, 170,  50,  50],
+            "green_enemy":[100, 170,  50,  50]
         }
     }
 }
