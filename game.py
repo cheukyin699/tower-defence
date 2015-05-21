@@ -447,16 +447,25 @@ class GameMenu(pygame.sprite.Sprite):
                 self.drag = None
             elif mstate == 'P':
                 for t in self.tlist.sprites():
-                    if t.rect.collidepoint(mx,my) and self.gs.money-t.cost >= 0:
+                    if t.rect.collidepoint(mx,my) and (self.gs.money-t.cost >= 0 or self.gs.state == Mode.sandbox):
                         # If you clicked the tower, just set dragged tower
                         # and break out of loop, because it is impossible to
                         # click on multiple ones
                         self.drag = t
                         break
-            if self.play_bt.rect.collidepoint(mx,my):
-                self.play_bt.state = mstate
-            elif self.play_bt.state == 'O':
-                self.play_bt.state = 'N'
+            if self.gs.state == Mode.freeplay:
+                if self.play_bt.rect.collidepoint(mx,my):
+                    self.play_bt.state = mstate
+                elif self.play_bt.state == 'O':
+                    self.play_bt.state = 'N'
+            else:
+                for e in self.elist.sprites():
+                    if e.rect.collidepoint(mx,my) and (self.gs.money-e.cost >= 0 or self.gs.state == Mode.sandbox) and mstate == 'U':
+                        # If you clicked on the enemy, just buy it (in multiplayer) and
+                        # send it out on your own side (if sandbox)
+                        spawnen = enemy.get_correct_enemy_type(e.eid)(e)
+                        spawnen.path = self.rmanager.data['maps'][self.gs.currentmap]['path']
+                        self.gs.enemies.append(spawnen)
 
 class GameState(State):
     '''
@@ -489,6 +498,9 @@ class GameState(State):
         self.runthru_enemy = False
         # Timer
         self.en_cd = 0
+
+        # TODO: Grab the current map
+        self.currentmap = "grass-map1"
 
     def draw(self):
         self.surface.fill(Color.black)
@@ -529,9 +541,11 @@ class GameState(State):
                 self.wave += 1
                 self.runthru_enemy = False
             elif self.enem_on[0] > 0:
-                en = enemy.get_correct_enemy_type(self.enem_on[1])
+                en = enemy.get_correct_enemy_type(self.enem_on[1])(enemy.bEnemy(self.rmanager,self.rmanager.data['enemies'][self.enem_on[1]], [0,0]))
                 en.path = self.rmanager.data['maps'][self.currentmap]['path']
                 self.enemies.append(en)
+                # Subtract from enem_on[0]
+                self.enem_on[0] -= 1
                 # Wait 3 ticks
                 self.en_cd = 3
             else:
@@ -617,7 +631,8 @@ class GameState(State):
                 self.towers.add(t)
                 self.gm.drag = None
                 # TAKE YO MONEY
-                self.money -= t.cost
+                if not self.state == Mode.sandbox:
+                    self.money -= t.cost
             else:
                 # If you placed it on top of another
                 # tower, remove and try again

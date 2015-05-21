@@ -2,7 +2,17 @@ import pygame
 import game
 
 def get_correct_enemy_type(num):
-    pass
+    if num == 0:
+        # Red enemy
+        return RedEnemy
+    elif num == 1:
+        # Blue enemy
+        return BlueEnemy
+    elif num == 2:
+        # Green enemy
+        return GreenEnemy
+    else:
+        return RedEnemy
 
 class bEnemy(pygame.sprite.Sprite):
     def __init__(self, rmanager, data, pos):
@@ -19,6 +29,7 @@ class bEnemy(pygame.sprite.Sprite):
         self.hp = data['hp']
         self.maxhp = self.hp
         self.speed = data['speed']
+        self.eid = data['eid']
 
         costlbl = self.rmanager.fonts['monospace'].render('$'+str(self.cost), True, game.Color.green)
         self.rect = self.image.get_rect()
@@ -34,7 +45,7 @@ class Enemy(pygame.sprite.Sprite):
         
         self.rmanager = e.rmanager
 
-        self.image = self.rmanager.sprites[e.sprite].copy()
+        self.image = self.rmanager.sprites[self.rmanager.data['enemies'][e.eid]['sprite']].copy()
         self.sprite = e.sprite
 
         self.rect = self.image.get_rect()
@@ -58,8 +69,14 @@ class Enemy(pygame.sprite.Sprite):
 
     def update(self, gs):
         if self.hp <= 0:
-            if self.child:
-                e = self.child(self)
+            if self.child != None:
+                datas = self.rmanager.data['enemies'][self.child]
+                be = get_correct_enemy_type(self.child)(bEnemy(self.rmanager, datas, [0,0]))
+                be.rect = self.rect
+                be.veloc = self.veloc
+                be.pathind = self.pathind
+                be.path = self.path
+                gs.enemies.append(be)
             if gs.state != game.Mode.sandbox:
                 gs.money += self.cost
             self.kill()
@@ -85,6 +102,42 @@ class Enemy(pygame.sprite.Sprite):
 
 class RedEnemy(Enemy):
     def __init__(self, en):
+        self.eid = 0
+
         Enemy.__init__(self, en)
-        
+
         self.child = None
+
+    def update(self, gs):
+        Enemy.update(self, gs)
+
+    def draw(self, surface):
+        Enemy.draw(self, surface)
+
+class BlueEnemy(Enemy):
+    def __init__(self, en):
+        self.eid = 1
+
+        Enemy.__init__(self, en)
+
+        self.child = 0
+
+    def update(self, gs):
+        Enemy.update(self, gs)
+
+    def draw(self, surface):
+        Enemy.draw(self, surface)
+
+class GreenEnemy(Enemy):
+    def __init__(self, en):
+        self.eid = 2
+
+        Enemy.__init__(self, en)
+
+        self.child = 1
+
+    def update(self, gs):
+        Enemy.update(self, gs)
+
+    def draw(self, surface):
+        Enemy.draw(self, surface)
