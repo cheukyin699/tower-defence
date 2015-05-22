@@ -1,18 +1,7 @@
 import pygame
 import game
 
-def get_correct_enemy_type(num):
-    if num == 0:
-        # Red enemy
-        return RedEnemy
-    elif num == 1:
-        # Blue enemy
-        return BlueEnemy
-    elif num == 2:
-        # Green enemy
-        return GreenEnemy
-    else:
-        return RedEnemy
+
 
 class bEnemy(pygame.sprite.Sprite):
     def __init__(self, rmanager, data, pos):
@@ -143,3 +132,40 @@ class GreenEnemy(Enemy):
 
     def draw(self, surface):
         Enemy.draw(self, surface)
+
+class YellowEnemy(Enemy):
+    def __init__(self, en):
+        self.eid = 3
+
+        Enemy.__init__(self, en)
+
+        self.child = 2
+
+    def update(self, gs):
+        Enemy.update(self, gs)
+
+    def draw(self, surface):
+        Enemy.draw(self, surface)
+
+class PinkEnemy(Enemy):
+    def __init__(self, en):
+        self.eid = 4
+
+        Enemy.__init__(self, en)
+
+        self.child = 3
+
+    def update(self, gs):
+        Enemy.update(self, gs)
+
+    def draw(self, surface):
+        Enemy.draw(self, surface)
+ 
+enem_Map = [RedEnemy, BlueEnemy, GreenEnemy, YellowEnemy, PinkEnemy]
+
+
+def get_correct_enemy_type(num):
+    try:
+        return enem_Map[num]
+    except:
+        raise Exception("Enemy #%d not found exception" % num)

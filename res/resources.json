@@ -29,7 +29,9 @@
             // Some enemies
             "red_enemy": [   0, 170,  50,  50],
             "blue_enemy":[  50, 170,  50,  50],
-            "green_enemy":[100, 170,  50,  50]
+            "green_enemy":[100, 170,  50,  50],
+            "yell_enemy":[ 150, 170,  50,  50],
+            "pink_enemy":[ 200, 170,  50,  50]
         }
     }
 }

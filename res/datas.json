@@ -26,6 +26,24 @@
     		"name": "Green Enemy",
     		"sprite": "green_enemy",
     		"speed": 2.5
+    	},
+    	{
+    		"eid": 3,
+    		"cost": 50,
+    		"eco": 3,
+    		"hp": 1,
+    		"name": "Yellow Enemy",
+    		"sprite": "yell_enemy",
+    		"speed": 5
+    	},
+    	{
+    		"eid": 4,
+    		"cost": 75,
+    		"eco": 5,
+    		"hp": 1,
+    		"name": "Pink Enemy",
+    		"sprite": "pink_enemy",
+    		"speed": 7
     	}
     		
     ],
@@ -68,6 +86,7 @@
     },
 	"waves": [
 		["20x0", "T:25", "20x1", "T:50"],
-        ["T:10", "50x0", "50x1", "T:5", "10x2", "T:50"]
+        ["T:10", "50x0", "50x1", "T:5", "10x2", "T:50"],
+        ["2x3", "T:25", "30x1", "T:50", "20x2", "10x3"]
 	]
 }

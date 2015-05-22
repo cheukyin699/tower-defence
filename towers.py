@@ -109,13 +109,23 @@ class rTower(pygame.sprite.Sprite):
                 if self.target == 0:
                     # Shoot the first
                     self.shoot = [enems_rng[0][0].rect.centerx,enems_rng[0][0].rect.centery]
-                    # Change the shooting angle
-                    self.angle = game.getAngle((self.rect.centerx, self.rect.centery), self.shoot)
-                    self.image = pygame.transform.rotate(self.rmanager.sprites[self.sprite].copy(), self.angle)
-                    # Change rects
-                    x, y = self.rect.centerx, self.rect.centery
-                    self.rect = self.image.get_rect()
-                    self.rect.centerx, self.rect.centery = x, y
+                elif self.target == 1:
+                    # Shoot the last
+                    self.shoot = [enems_rng[-1][0].rect.centerx,enems_rng[-1][0].rect.centery]
+                elif self.target == 2:
+                    # Find the one that is closest to tower
+                    min(enems_rng, key=lambda e:e[1])
+                elif self.target == 3:
+                    # Shoot the strongest
+                    # Actually, they are ordered by enemy_id
+                    max(enems_rng, key=lambda e:e[0].eid)
+                # Change the shooting angle
+                self.angle = game.getAngle((self.rect.centerx, self.rect.centery), self.shoot)
+                self.image = pygame.transform.rotate(self.rmanager.sprites[self.sprite].copy(), self.angle)
+                # Change rects
+                x, y = self.rect.centerx, self.rect.centery
+                self.rect = self.image.get_rect()
+                self.rect.centerx, self.rect.centery = x, y
                 self.reloading = self.rate
         else:
             self.reloading -= 1
