@@ -102,23 +102,28 @@ class rTower(pygame.sprite.Sprite):
             for e in enemies:
                 dist = getDist(e.rect, self.rect)
                 if dist <= self.range:
-                    enems_rng.append([e, dist])
+                    prior = e.pathind + 1 - game.getDist(e.path[e.pathind], e.rect.center)/game.getDist(e.path[e.pathind], e.path[e.pathind-1])
+                    enems_rng.append([e, dist, prior])
 
             # Check for shooting target priority
             if len(enems_rng) >= 1:
                 if self.target == 0:
                     # Shoot the first
-                    self.shoot = [enems_rng[0][0].rect.centerx,enems_rng[0][0].rect.centery]
+                    s = max(enems_rng, key=lambda e:e[2])
+                    self.shoot = [s[0].rect.centerx,s[0].rect.centery]
                 elif self.target == 1:
                     # Shoot the last
-                    self.shoot = [enems_rng[-1][0].rect.centerx,enems_rng[-1][0].rect.centery]
+                    s = min(enems_rng, key=lambda e:e[2])
+                    self.shoot = [s[0].rect.centerx,s[0].rect.centery]
                 elif self.target == 2:
                     # Find the one that is closest to tower
-                    min(enems_rng, key=lambda e:e[1])
+                    s = min(enems_rng, key=lambda e:e[1])
+                    self.shoot = [s[0].rect.centerx,s[0].rect.centery]
                 elif self.target == 3:
                     # Shoot the strongest
                     # Actually, they are ordered by enemy_id
-                    max(enems_rng, key=lambda e:e[0].eid)
+                    s = max(enems_rng, key=lambda e:e[0].eid)
+                    self.shoot = [s[0].rect.centerx,s[0].rect.centery]
                 # Change the shooting angle
                 self.angle = game.getAngle((self.rect.centerx, self.rect.centery), self.shoot)
                 self.image = pygame.transform.rotate(self.rmanager.sprites[self.sprite].copy(), self.angle)

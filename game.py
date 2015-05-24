@@ -67,7 +67,7 @@ def getDist(a, b):
 
     Returns the straight line distance between the 2 points
     '''
-    return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
+    return math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2)
 
 # CLASSES
 class Mode:

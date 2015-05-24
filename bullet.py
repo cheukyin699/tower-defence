@@ -33,7 +33,7 @@ class Missile(Bullet):
         Bullet.__init__(self, pos, veloc, 1, 1)
 
         # The explosion radius
-        self.exp_rad = 50
+        self.exp_rad = 100
         
     def hit(self, gs, enem):
         for e in gs.enemies:
