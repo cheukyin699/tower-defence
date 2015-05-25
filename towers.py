@@ -66,6 +66,7 @@ class rTower(pygame.sprite.Sprite):
         self.name = t.name
         self.shotveloc = t.shotveloc
         self.angle = 0
+        self.sold = False
 
         self.rect = self.image.get_rect()
         self.rect.x = t.rect.x
@@ -105,10 +106,12 @@ class rTower(pygame.sprite.Sprite):
             self.projectile = None
 
     def sell(self):
+        self.sold = True
         if self.gs.state != game.Mode.sandbox:
             # Give moneys if not sandbox
-            self.gs.money += self.cost * 0.75
+            self.gs.money += int(self.cost * 0.75)
         self.kill()
+
 
     def cycle_targeting(self):
         self.target = (self.target+1)%4
