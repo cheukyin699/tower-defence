@@ -381,7 +381,7 @@ class GameMenu(pygame.sprite.Sprite):
         # Init towers
         ind = 0
         for data in self.rmanager.data['towers'].itervalues():
-            t = towers.Tower(self.rmanager, data, (50*ind+100, 5))
+            t = towers.Tower(self.rmanager, data, (50*ind+100, 5), self.gs)
             self.tlist.add(t)
             ind += 1
 
@@ -439,8 +439,7 @@ class GameMenu(pygame.sprite.Sprite):
         else:
             # If you have focused on some random tower,
             # display the upgrade menu
-            namelbl = self.rmanager.fonts['monospace'].render(self.focus.name, True, Color.blue)
-            self.image.blit(namelbl, (0, namelbl.get_rect().h*2))
+            self.focus.draw_to_menu(self.image)
             # Draw the range (without alpha)
             pygame.draw.circle(surface, Color.white, (self.focus.rect.centerx,self.focus.rect.centery), self.focus.range, 1)
 
@@ -471,6 +470,9 @@ class GameMenu(pygame.sprite.Sprite):
                         spawnen = enemy.get_correct_enemy_type(e.eid)(e)
                         spawnen.path = self.rmanager.data['maps'][self.gs.currentmap]['path']
                         self.gs.enemies.append(spawnen)
+        else:
+            # Handle focus
+            self.focus.handlemousestate((mx, my), mstate)
 
 class GameState(State):
     '''
@@ -614,7 +616,7 @@ class GameState(State):
             # Check to see if you are clicking off the focused
             # tower. To click off the focused tower, click on
             # something else
-            if self.gm.focus:
+            if self.gm.focus and not self.gm.rect.collidepoint(mx,my):
                 self.gm.focus = None
 
             # Check all towers

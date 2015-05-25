@@ -8,10 +8,11 @@ class Tower(pygame.sprite.Sprite):
     The tower with the money displayed
     Only used in menus
     '''
-    def __init__(self, rmanager, data, (x,y)):
+    def __init__(self, rmanager, data, (x,y), gs):
         pygame.sprite.Sprite.__init__(self)
 
         self.rmanager = rmanager
+        self.gs = gs
 
         self.image = self.rmanager.sprites[data['sprite']].copy()
         self.orgimage = self.image.copy()
@@ -54,6 +55,7 @@ class rTower(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.rmanager = t.rmanager
+        self.gs = t.gs
 
         self.image = self.rmanager.sprites[t.sprite].copy()
         self.cost = t.cost
@@ -82,7 +84,15 @@ class rTower(pygame.sprite.Sprite):
         Defaults to First (0)
         '''
         self.target = 0
-        
+        self.targetbt = game.Button.sMade(type="button",text='First', sprite='Button1',sound='wood-click',
+                pos=[0,30*2], rmanager=self.rmanager)
+        self.targetbt.callback(self.cycle_targeting)
+
+        # Sell button
+        self.sellbt = game.Button.sMade(type="button",text="Sell",sprite='Button1',sound='wood-click',
+                pos=[0,30*3+5], rmanager=self.rmanager)
+        self.sellbt.callback(self.sell)
+
         '''
         Now, for the type of projectile (if any)
         that this tower would shoot
@@ -93,6 +103,33 @@ class rTower(pygame.sprite.Sprite):
             self.projectile = bullet.Missile
         elif self.sprite == 'sniperturret':
             self.projectile = None
+
+    def sell(self):
+        if self.gs.state != game.Mode.sandbox:
+            # Give moneys if not sandbox
+            self.gs.money += self.cost * 0.75
+        self.kill()
+
+    def cycle_targeting(self):
+        self.target = (self.target+1)%4
+        if self.target == 0:
+            self.targetbt.text = 'First'
+        elif self.target == 1:
+            self.targetbt.text = 'Last'
+        elif self.target == 2:
+            self.targetbt.text = 'Close'
+        else:
+            self.targetbt.text = 'Strong'
+
+    def handlemousestate(self, (mx, my), mstate):
+        if self.targetbt.rect.collidepoint(mx, my):
+            self.targetbt.state = mstate
+            if mstate == 'U':
+                self.targetbt.do_callback()
+        elif self.sellbt.rect.collidepoint(mx, my) and mstate == 'U':
+            self.sellbt.state = mstate
+            if mstate == 'U':
+                self.sellbt.do_callback()
 
     def update(self, enemies):
         if self.reloading <= 0:
@@ -135,10 +172,24 @@ class rTower(pygame.sprite.Sprite):
         else:
             self.reloading -= 1
 
+    def draw_to_menu(self, surface):
+        '''
+        Draws to the menu
+        '''
+        # Draws the label
+        namelbl = self.rmanager.fonts['monospace'].render(self.name, True, game.Color.blue)
+        surface.blit(namelbl, (0, namelbl.get_rect().h*2))
+        # Update buttons
+        self.targetbt.update()
+        self.sellbt.update()
+        # Draw buttons
+        self.targetbt.draw(surface)
+        self.sellbt.draw(surface)
+
 class SniperTower(rTower):
     def __init__(self, t):
         rTower.__init__(self, t)
-        
+
     def update(self, enemies):
         if self.reloading <= 0:
             # Finished sniper reloading
