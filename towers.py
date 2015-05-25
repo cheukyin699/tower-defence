@@ -126,7 +126,7 @@ class rTower(pygame.sprite.Sprite):
             self.targetbt.state = mstate
             if mstate == 'U':
                 self.targetbt.do_callback()
-        elif self.sellbt.rect.collidepoint(mx, my) and mstate == 'U':
+        elif self.sellbt.rect.collidepoint(mx, my):
             self.sellbt.state = mstate
             if mstate == 'U':
                 self.sellbt.do_callback()
