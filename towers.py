@@ -91,7 +91,7 @@ class rTower(pygame.sprite.Sprite):
 
         # Sell button
         self.sellbt = game.Button.sMade(type="button",text="Sell",sprite='Button1',sound='wood-click',
-                pos=[0,30*3+5], rmanager=self.rmanager)
+                pos=[0,30*3+5],size=[120,30],rmanager=self.rmanager)
         self.sellbt.callback(self.sell)
 
         '''
@@ -104,6 +104,9 @@ class rTower(pygame.sprite.Sprite):
             self.projectile = bullet.Missile
         elif self.sprite == 'sniperturret':
             self.projectile = None
+
+    def cost_update(self):
+        self.sellbt.text = "Sell $%d" % int(self.cost * .75)
 
     def sell(self):
         self.sold = True
@@ -183,6 +186,7 @@ class rTower(pygame.sprite.Sprite):
         namelbl = self.rmanager.fonts['monospace'].render(self.name, True, game.Color.blue)
         surface.blit(namelbl, (0, namelbl.get_rect().h*2))
         # Update buttons
+        self.cost_update()
         self.targetbt.update()
         self.sellbt.update()
         # Draw buttons
