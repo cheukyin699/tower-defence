@@ -585,14 +585,16 @@ class GameState(State):
             if e.rect.centerx > self.SIZE[0]:
                 if self.state != Mode.sandbox:
                     self.lives -= e.hp
-                self.enemies.remove(e)
+                    e.hp = 0
+                    e.offscreen = True
+                    e.update(self)
+                else:
+                    # Just remove them if they are in sandbox
+                    self.enemies.remove(e)
             else:
                 e.update(self)
             if e.hp <= 0:
-                try:
-                    self.enemies.remove(e)
-                except:
-                    pass
+                self.enemies.remove(e)
 
         self.towers.update(self.enemies)
         self.projectiles.update(self.SIZE)

@@ -53,6 +53,9 @@ class Enemy(pygame.sprite.Sprite):
         # The path index
         self.pathind = 0
         self.path = []
+        
+        # If offscreen, don't give anyone money
+        self.offscreen = False
 
         # If killed, will drop this amount
         self.cost = self.hp
@@ -64,12 +67,13 @@ class Enemy(pygame.sprite.Sprite):
                 be = get_correct_enemy_type(self.child)(bEnemy(self.rmanager, datas, [0,0]))
                 be.rect = self.rect
                 be.veloc = self.veloc
+                be.offscreen = self.offscreen
                 be.pathind = self.pathind
                 be.path = self.path
                 # Set the hp - if hp is negative, so be it
                 be.hp += self.hp
                 gs.enemies.append(be)
-            if gs.state != game.Mode.sandbox:
+            if gs.state != game.Mode.sandbox and not self.offscreen:
                 gs.money += self.cost
 
         # New point-to-point pathing system
