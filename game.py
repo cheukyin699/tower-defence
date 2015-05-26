@@ -589,7 +589,10 @@ class GameState(State):
             else:
                 e.update(self)
             if e.hp <= 0:
-                self.enemies.remove(e)
+                try:
+                    self.enemies.remove(e)
+                except:
+                    pass
 
         self.towers.update(self.enemies)
         self.projectiles.update(self.SIZE)

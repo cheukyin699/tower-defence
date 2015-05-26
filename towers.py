@@ -3,6 +3,13 @@ import math
 import game
 import bullet
 
+def getDist(a, b):
+    return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
+
+def get_enemy_pathpoints(e):
+    prior = e.pathind + 1 - game.getDist(e.path[e.pathind], e.rect.center)/game.getDist(e.path[e.pathind], e.path[e.pathind-1])
+    return prior
+
 class Tower(pygame.sprite.Sprite):
     '''
     The tower with the money displayed
@@ -42,9 +49,6 @@ class Tower(pygame.sprite.Sprite):
         elif self.sprite == 'sniperturret':
             self.projectile = None
             self.tower = SniperTower
-
-def getDist(a, b):
-    return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
 
 class rTower(pygame.sprite.Sprite):
     '''
@@ -143,7 +147,7 @@ class rTower(pygame.sprite.Sprite):
             for e in enemies:
                 dist = getDist(e.rect, self.rect)
                 if dist <= self.range:
-                    prior = e.pathind + 1 - game.getDist(e.path[e.pathind], e.rect.center)/game.getDist(e.path[e.pathind], e.path[e.pathind-1])
+                    prior = get_enemy_pathpoints(e)
                     enems_rng.append([e, dist, prior])
 
             # Check for shooting target priority
@@ -200,10 +204,22 @@ class SniperTower(rTower):
             # Finished sniper reloading
             # Just attack (no need for range)
             if len(enemies) > 0:
+                self.shoot = 'C'
+                e = None
                 if self.target == 0:
                     # Shoot the first in line
-                    self.shoot = 'C'
-                    e = enemies[0]
+                    e = max(enemies, key=lambda enem:get_enemy_pathpoints(enem))
+                elif self.target == 1:
+                    # Shoot the last in line
+                    e = min(enemies, key=lambda enem:get_enemy_pathpoints(enem))
+                elif self.target == 2:
+                    # Shoot the one that is the closest to tower
+                    e = min(enemies, key=lambda enem:getDist(self.rect, enem.rect))
+                elif self.target == 3:
+                    # Shoot the strongest one
+                    e = max(enemies, key=lambda enem:enem.eid)
+
+                if e:
                     self.angle = game.getAngle((self.rect.centerx, self.rect.centery), (e.rect.centerx, e.rect.centery))
                     self.image = pygame.transform.rotate(self.rmanager.sprites[self.sprite].copy(), self.angle)
                     # Attack
@@ -212,6 +228,6 @@ class SniperTower(rTower):
                     x, y = self.rect.centerx, self.rect.centery
                     self.rect = self.image.get_rect()
                     self.rect.centerx, self.rect.centery = x, y
-                self.reloading = self.rate
+                    self.reloading = self.rate
         else:
             self.reloading -= 1

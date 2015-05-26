@@ -66,10 +66,11 @@ class Enemy(pygame.sprite.Sprite):
                 be.veloc = self.veloc
                 be.pathind = self.pathind
                 be.path = self.path
+                # Set the hp - if hp is negative, so be it
+                be.hp += self.hp
                 gs.enemies.append(be)
             if gs.state != game.Mode.sandbox:
                 gs.money += self.cost
-            self.kill()
 
         # New point-to-point pathing system
         if self.pathind == 0:
