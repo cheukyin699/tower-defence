@@ -116,7 +116,6 @@ class rTower(pygame.sprite.Sprite):
                 self.gs.money += int(self.cost * 0.75)
             self.kill()
 
-
     def cycle_targeting(self):
         self.target = (self.target+1)%4
         if self.target == 0:
@@ -128,15 +127,13 @@ class rTower(pygame.sprite.Sprite):
         else:
             self.targetbt.text = 'Strong'
 
-    def handlemousestate(self, (mx, my), mstate):
+    def handlemousestate(self, (mx, my), mstate='N'):
+        self.targetbt.state = 'N'
+        self.sellbt.state = 'N'
         if self.targetbt.rect.collidepoint(mx, my):
             self.targetbt.state = mstate
-            if mstate == 'U':
-                self.targetbt.do_callback()
         elif self.sellbt.rect.collidepoint(mx, my):
             self.sellbt.state = mstate
-            if mstate == 'U':
-                self.sellbt.do_callback()
 
     def update(self, enemies):
         if self.reloading <= 0:
