@@ -109,11 +109,12 @@ class rTower(pygame.sprite.Sprite):
         self.sellbt.text = "Sell $%d" % int(self.cost * .75)
 
     def sell(self):
-        self.sold = True
-        if self.gs.state != game.Mode.sandbox:
-            # Give moneys if not sandbox
-            self.gs.money += int(self.cost * 0.75)
-        self.kill()
+        if not self.sold:
+            self.sold = True
+            if self.gs.state != game.Mode.sandbox:
+                # Give moneys if not sandbox
+                self.gs.money += int(self.cost * 0.75)
+            self.kill()
 
 
     def cycle_targeting(self):

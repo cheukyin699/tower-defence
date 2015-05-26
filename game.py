@@ -445,6 +445,10 @@ class GameMenu(pygame.sprite.Sprite):
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
+    def update(self):
+        if self.focus and self.focus.sold:
+            self.focus = None
+
     def handlemousestate(self, (mx, my), mstate='N'):
         if self.focus == None:
             if self.drag != None and mstate == 'U':
@@ -590,6 +594,7 @@ class GameState(State):
         self.towers.update(self.enemies)
         self.projectiles.update(self.SIZE)
         self.fx.update()
+        self.gm.update()
 
         # Shoot stuff
         for t in self.towers.sprites():
