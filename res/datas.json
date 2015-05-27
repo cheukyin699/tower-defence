@@ -7,7 +7,7 @@
     		"hp": 1,
     		"name": "Red Enemy",
     		"sprite": "red_enemy",
-    		"speed": 1.5
+    		"speed": 2
     	},
     	{
             "eid": 1,

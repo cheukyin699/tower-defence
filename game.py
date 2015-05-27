@@ -137,13 +137,28 @@ class Sprite(pygame.sprite.Sprite):
 class Explosion(Sprite):
     def __init__(self, data, rmanager):
         Sprite.__init__(self, data, rmanager)
-        
+
         # Set pos in middle
-        self.rect.centerx = data['pos'][0]
-        self.rect.centery = data['pos'][1]
-        
+        self.rect.center = data['pos']
+
         self.life = data['life']
-        
+
+    def update(self):
+        if self.life <= 0:
+            self.kill()
+        else:
+            self.life -= 1
+
+class OverheadText(pygame.sprite.Sprite):
+    def __init__(self, rmanager, text, pos, size):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.transform.scale(rmanager.fonts['monospace'].render(text, True, Color.red), size)
+        self.rect = self.image.get_rect()
+        self.rect.center = pos
+
+        self.life = 450
+
     def update(self):
         if self.life <= 0:
             self.kill()
@@ -164,7 +179,7 @@ class Button(Sprite):
 
         self.cb = None
         self.cb_args = []
-        
+
         # Sound on button click
         self.sound = data['sound']
         self.played = False
@@ -378,6 +393,10 @@ class GameMenu(pygame.sprite.Sprite):
                     pos=[self.rect.w*.75, 0], size=[80, self.rect.h], rmanager=self.rmanager)
             self.play_bt.callback(self.gs.nextWave)
 
+        # Depressed enemy button
+        if self.gs.state != Mode.freeplay:
+            self.depressed_enemy = None
+
         # Init towers
         ind = 0
         for data in self.rmanager.data['towers'].itervalues():
@@ -449,6 +468,9 @@ class GameMenu(pygame.sprite.Sprite):
         if self.focus and self.focus.sold:
             self.focus = None
 
+        if self.depressed_enemy:
+            self.gs.enemies.append(self.depressed_enemy)
+
     def handlemousestate(self, (mx, my), mstate='N'):
         if self.focus == None:
             if self.drag != None and mstate == 'U':
@@ -468,12 +490,15 @@ class GameMenu(pygame.sprite.Sprite):
                     self.play_bt.state = 'N'
             else:
                 for e in self.elist.sprites():
-                    if e.rect.collidepoint(mx,my) and (self.gs.money-e.cost >= 0 or self.gs.state == Mode.sandbox) and mstate == 'U':
+                    if e.rect.collidepoint(mx,my) and (self.gs.money-e.cost >= 0 or self.gs.state == Mode.sandbox) and mstate == 'P':
                         # If you clicked on the enemy, just buy it (in multiplayer) and
                         # send it out on your own side (if sandbox)
                         spawnen = enemy.get_correct_enemy_type(e.eid)(e)
                         spawnen.path = self.rmanager.data['maps'][self.gs.currentmap]['path']
+                        self.depressed_enemy = spawnen
                         self.gs.enemies.append(spawnen)
+                    elif e.rect.collidepoint(mx,my) and (self.gs.money-e.cost >= 0 or self.gs.state == Mode.sandbox) and mstate == 'U':
+                        self.depressed_enemy = None
         else:
             # Handle focus
             self.focus.handlemousestate((mx, my), mstate)
@@ -511,6 +536,8 @@ class GameState(State):
         self.en_cd = 0
         # Crowd density
         self.density = 50
+        # End the game?
+        self.end_game = False
 
         # TODO: Grab the current map
         self.currentmap = "grass-map1"
@@ -521,12 +548,13 @@ class GameState(State):
         # Draw the background on first
         self.surface.blit(self.bg.layers['background'].image, (0,0))
 
-        for i in xrange(len(self.enemies)):
-            self.enemies[i].draw(self.surface)
-        self.towers.draw(self.surface)
-        self.projectiles.draw(self.surface)
-        self.fx.draw(self.surface)
-        self.gm.draw(self.surface)
+        if not self.end_game:
+            for i in xrange(len(self.enemies)):
+                self.enemies[i].draw(self.surface)
+            self.towers.draw(self.surface)
+            self.projectiles.draw(self.surface)
+            self.fx.draw(self.surface)
+            self.gm.draw(self.surface)
 
         # Check for dragging something
         if self.gm.drag != None:
@@ -596,10 +624,11 @@ class GameState(State):
             if e.hp <= 0:
                 self.enemies.remove(e)
 
-        self.towers.update(self.enemies)
-        self.projectiles.update(self.SIZE)
+        if not self.end_game:
+            self.towers.update(self.enemies)
+            self.projectiles.update(self.SIZE)
+            self.gm.update()
         self.fx.update()
-        self.gm.update()
 
         # Shoot stuff
         for t in self.towers.sprites():
@@ -612,6 +641,18 @@ class GameState(State):
 
                 # Reset tower shot to None
                 t.shoot = None
+
+        # If you lose (0 lives), then go back to menu after displaying message
+        if self.lives <= 0 and not self.end_game:
+            ot = OverheadText(self.rmanager, 'You SUCK', [self.SIZE[0]/2,self.SIZE[1]/2], [200,200])
+            self.fx.add(ot)
+            self.fadeout = ot.life
+            self.end_game = True
+        if self.end_game:
+            if self.fadeout <= 0:
+                self.state = Mode.menu
+            else:
+                self.fadeout -= 1
 
     def nextWave(self):
         '''
