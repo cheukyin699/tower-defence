@@ -7,6 +7,7 @@ Author: Cheuk Yin Ng <chucksys88@gmail.com>
 
 Version: v0.0.0 non-released
 
+For more information on how to play, tower/enemy info, etc., please visit [the wiki](https://github.com/cheukyin699/tower-defence/wiki).
 
 Requirements
 ------------
