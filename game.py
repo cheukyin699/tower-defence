@@ -469,7 +469,9 @@ class GameMenu(pygame.sprite.Sprite):
             self.focus = None
 
         if self.depressed_enemy:
-            self.gs.enemies.append(self.depressed_enemy)
+            spawnen = enemy.get_correct_enemy_type(self.depressed_enemy.eid)(self.depressed_enemy)
+            spawnen.path = self.rmanager.data['maps'][self.gs.currentmap]['path']
+            self.gs.enemies.append(spawnen)
 
     def handlemousestate(self, (mx, my), mstate='N'):
         if self.focus == None:
@@ -495,7 +497,7 @@ class GameMenu(pygame.sprite.Sprite):
                         # send it out on your own side (if sandbox)
                         spawnen = enemy.get_correct_enemy_type(e.eid)(e)
                         spawnen.path = self.rmanager.data['maps'][self.gs.currentmap]['path']
-                        self.depressed_enemy = spawnen
+                        self.depressed_enemy = e
                         self.gs.enemies.append(spawnen)
                     elif e.rect.collidepoint(mx,my) and (self.gs.money-e.cost >= 0 or self.gs.state == Mode.sandbox) and mstate == 'U':
                         self.depressed_enemy = None
@@ -572,6 +574,8 @@ class GameState(State):
             mp[0] -= self.gm.drag.rect.w/2
             mp[1] -= self.gm.drag.rect.h/2
             self.surface.blit(self.gm.drag.orgimage, mp)
+
+        pygame.draw.circle(self.surface, Color.red, [32,240], 1)
 
     def update(self):
         if self.runthru_enemy and self.en_cd <= 0 and self.state != Mode.sandbox:

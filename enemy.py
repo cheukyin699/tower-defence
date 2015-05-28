@@ -39,8 +39,7 @@ class Enemy(pygame.sprite.Sprite):
         self.sprite = e.sprite
 
         self.rect = self.image.get_rect()
-        self.rect.centerx = 0
-        self.rect.centery = 200
+        self.rect.center = [0,0]
 
         # Set hit-points
         self.maxhp = e.hp
@@ -94,7 +93,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.centery += self.veloc[1]
 
     def draw(self, surface):
-        surface.blit(self.image, (self.rect.centerx, self.rect.centery))
+        surface.blit(self.image, (self.rect.x, self.rect.y))
 
 class RedEnemy(Enemy):
     def __init__(self, en):
