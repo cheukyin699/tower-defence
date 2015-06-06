@@ -18,20 +18,18 @@
             "menu-back": [  50,   0, 200,  90],
             "td-label":  [   0,  90, 224,  27],
 
-            // Some towers
             "gunturret": [   0, 117,  30,  34],
             "missturret":[  30, 117,  29,  27],
             "sniperturret": [59,117,  30,  50],
             
-            // Some FX
             "explosion": [ 250,   0,  98,  91],
             
-            // Some enemies
             "red_enemy": [   0, 170,  50,  50],
             "blue_enemy":[  50, 170,  50,  50],
             "green_enemy":[100, 170,  50,  50],
             "yell_enemy":[ 150, 170,  50,  50],
-            "pink_enemy":[ 200, 170,  50,  50]
+            "pink_enemy":[ 200, 170,  50,  50],
+            "black_enemy":[250, 170,  50,  50]
         }
     }
 }

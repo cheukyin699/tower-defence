@@ -62,16 +62,29 @@ class Enemy(pygame.sprite.Sprite):
     def update(self, gs):
         if self.hp <= 0:
             if self.child != None:
-                datas = self.rmanager.data['enemies'][self.child]
-                be = get_correct_enemy_type(self.child)(bEnemy(self.rmanager, datas, [0,0]))
-                be.rect = self.rect
-                be.veloc = self.veloc
-                be.offscreen = self.offscreen
-                be.pathind = self.pathind
-                be.path = self.path
-                # Set the hp - if hp is negative, so be it
-                be.hp += self.hp
-                gs.enemies.append(be)
+                if type(self.child) is int:
+                    datas = self.rmanager.data['enemies'][self.child]
+                    be = get_correct_enemy_type(self.child)(bEnemy(self.rmanager, datas, [0,0]))
+                    be.rect = self.rect
+                    be.veloc = self.veloc
+                    be.offscreen = self.offscreen
+                    be.pathind = self.pathind
+                    be.path = self.path
+                    # Set the hp - if hp is negative, so be it
+                    be.hp += self.hp
+                    gs.enemies.append(be)
+                elif type(self.child) is list:
+                    for c in self.child:
+                        datas = self.rmanager.data['enemies'][c]
+                        be = get_correct_enemy_type(c)(bEnemy(self.rmanager, datas, [0,0]))
+                        be.rect = self.rect
+                        be.veloc = self.veloc
+                        be.offscreen = self.offscreen
+                        be.pathind = self.pathind
+                        be.path = self.path
+                        # Set the hp - if hp is negative, so be it
+                        be.hp += self.hp
+                        gs.enemies.append(be)
             if gs.state != game.Mode.sandbox and not self.offscreen:
                 gs.money += self.cost
 
@@ -164,8 +177,22 @@ class PinkEnemy(Enemy):
 
     def draw(self, surface):
         Enemy.draw(self, surface)
+        
+class BlackEnemy(Enemy):
+    def __init__(self, en):
+        self.eid = 5
+        
+        Enemy.__init__(self, en)
+        
+        self.child = [4, 4]
+        
+    def update(self, gs):
+        Enemy.update(self, gs)
+        
+    def draw(self, surface):
+        Enemy.draw(self, surface)
  
-enem_Map = [RedEnemy, BlueEnemy, GreenEnemy, YellowEnemy, PinkEnemy]
+enem_Map = [RedEnemy, BlueEnemy, GreenEnemy, YellowEnemy, PinkEnemy, BlackEnemy]
 
 
 def get_correct_enemy_type(num):

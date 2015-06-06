@@ -44,8 +44,16 @@
     		"name": "Pink Enemy",
     		"sprite": "pink_enemy",
     		"speed": 7
-    	}
-    		
+    	},
+    	{
+    		"eid": 5,
+    		"cost": 125,
+    		"eco": 6,
+    		"hp": 1,
+    		"name": "Black Enemy",
+    		"sprite": "black_enemy",
+    		"speed": 3
+		}
     ],
     "towers": {
         "gun-turret": {
