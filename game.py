@@ -468,7 +468,7 @@ class GameMenu(pygame.sprite.Sprite):
         if self.focus and self.focus.sold:
             self.focus = None
 
-        if self.depressed_enemy:
+        if self.gs.state == Mode.sandbox and self.depressed_enemy:
             spawnen = enemy.get_correct_enemy_type(self.depressed_enemy.eid)(self.depressed_enemy)
             spawnen.path = self.rmanager.data['maps'][self.gs.currentmap]['path']
             self.gs.enemies.append(spawnen)
