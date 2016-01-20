@@ -10,11 +10,11 @@ class TileSet:
         self.name = data['name']
         self.tileheight = data['tileheight']
         self.tilewidth = data['tilewidth']
-        
+
         self.image = pygame.image.load(self.imgfn.replace('..', 'res'))
-        
+
     def getMaxTileId(self):
-        return self.fgid+(self.imgheight/self.tileheight)*(self.imgwidth/self.tilewidth)
+        return self.fgid + (self.imgheight / self.tileheight) * (self.imgwidth / self.tilewidth)
 
 class Layer:
     def __init__(self, data, (tw, th)):
@@ -22,7 +22,7 @@ class Layer:
         self.name = data['name']
         self.width = data['width']              # The number of tiles
         self.height = data['height']            # The number of tiles
-        
+
         self.tilewidth = tw
         self.tileheight = th
 
@@ -32,8 +32,8 @@ class Layer:
         # Now, blit EVERYTHING to the surface
         for i in xrange(len(self.data)):
             # REM: 'i' is the index and 'data[i]' is the id
-            xc, yc = ((i%self.width), (i//self.width))
-            self.image.blit(tileset[self.data[i]], (xc*self.tilewidth, yc*self.tileheight))
+            xc, yc = ((i % self.width), (i // self.width))
+            self.image.blit(tileset[self.data[i]], (xc * self.tilewidth, yc * self.tileheight))
 
 class TMXJsonMap:
     def __init__(self, filename):
@@ -49,14 +49,14 @@ class TMXJsonMap:
         # Init tilesets
         for ts in self.map['tilesets']:
             tileset = TileSet(ts)
-            for x in xrange(tileset.getMaxTileId()-tileset.fgid):
+            for x in xrange(tileset.getMaxTileId() - tileset.fgid):
                 # First, convert 1d coordinates into 2d
-                xc, yc = (x%(tileset.imgwidth/tileset.tilewidth), x//(tileset.imgwidth/tileset.tilewidth))
+                xc, yc = (x % (tileset.imgwidth / tileset.tilewidth), x // (tileset.imgwidth / tileset.tilewidth))
                 # Then, get the rectangle
-                rect = pygame.rect.Rect(xc*tileset.tilewidth, yc*tileset.tileheight, tileset.tilewidth, tileset.tileheight)
+                rect = pygame.rect.Rect(xc * tileset.tilewidth, yc * tileset.tileheight, tileset.tilewidth, tileset.tileheight)
                 # Insert into dictionary
-                self.tiles[x+tileset.fgid] = tileset.image.subsurface(rect)
-        
+                self.tiles[x + tileset.fgid] = tileset.image.subsurface(rect)
+
         # The layers dictionary
         self.layers = {}
         # Init layers

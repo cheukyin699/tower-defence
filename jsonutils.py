@@ -1,5 +1,6 @@
 # File: jsonutils
-# Description: Rewrites some json functions to make it comments-friendly
+# Description: Rewrites some json functions to make it comments-friendly.
+#              Supports comments starting with '//'.
 import json, re
 
 pat = re.compile('(//.*\n)')

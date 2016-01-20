@@ -72,7 +72,7 @@ def getDist(a, b):
 # CLASSES
 class Mode:
     '''
-    Just some normal game modes
+    Just some normal game modes (Treat this as an enum)
     '''
     errormsg = -1
     splash = 0
@@ -96,6 +96,9 @@ class Color:
     yellow =    (255, 255,   0)
 
 class Sprite(pygame.sprite.Sprite):
+    '''
+    Base class for a normal sprite
+    '''
     def __init__(self, data, rmanager):
         pygame.sprite.Sprite.__init__(self)
 
@@ -114,27 +117,27 @@ class Sprite(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.x = data['pos'][0]
             self.rect.y = data['pos'][1]
-        # If has visible(true on default)
+        # If has visible (true on default)
+        self.visible = True
         if data.has_key('visible'):
             self.visible = data['visible']
-        else:
-            self.visible = True
         # If has group
+        self.group = None
         if data.has_key('group'):
             self.group = data['group']
-        else:
-            self.group = None
         # If has size
+        self.size = None
         if data.has_key('size'):
             self.size = data['size']
-        else:
-            self.size = None
 
     def draw(self, surface):
         if self.visible:
             surface.blit(self.image, (self.rect.x, self.rect.y))
 
 class Explosion(Sprite):
+    '''
+    Base class for an explosion, inherits Sprite
+    '''
     def __init__(self, data, rmanager):
         Sprite.__init__(self, data, rmanager)
 
@@ -150,6 +153,10 @@ class Explosion(Sprite):
             self.life -= 1
 
 class OverheadText(pygame.sprite.Sprite):
+    '''
+    A small class that adds some text to display to the user.
+    You can set a timer on it.
+    '''
     def __init__(self, rmanager, text, pos, size):
         pygame.sprite.Sprite.__init__(self)
 
@@ -166,10 +173,16 @@ class OverheadText(pygame.sprite.Sprite):
             self.life -= 1
 
 class Button(Sprite):
+    '''
+    The base class for a button.
+    '''
     def __init__(self, data, rmanager):
         Sprite.__init__(self, data, rmanager)
 
         # Set to normal state (non-pressed)
+        # 'N' --> normal
+        # 'O' --> over
+        # 'P' --> pressed
         self.state = 'N'
 
         self.image = rmanager.sprites[self.sname + '-' + self.state]
@@ -251,7 +264,6 @@ class ErrorState(State):
     '''
     The class for handling unexpected errors.
     Expect use in debugging ONLY.
-    (Or maybe if the sky is falling, then I'll consider.)
     '''
     def __init__(self, surface, rmanager, mesg):
         State.__init__(self, surface, rmanager, state=Mode.errormsg)
@@ -269,7 +281,7 @@ class ErrorState(State):
 
 class SplashState(State):
     '''
-    The class for handling the splash state
+    The class for handling the splash screen state.
     '''
     def __init__(self, surface, rmanager):
         State.__init__(self, surface, rmanager, state=Mode.splash)
@@ -295,7 +307,7 @@ class SplashState(State):
 
 class MenuState(State):
     '''
-    The class for handling the menu state
+    The class for handling the menu state.
     '''
     def __init__(self, surface, rmanager):
         State.__init__(self, surface, rmanager, state=Mode.menu)
@@ -519,7 +531,8 @@ class GameState(State):
         self.fx = pygame.sprite.Group()
         self.gm = GameMenu(self.surface, self.rmanager, self)
 
-        # The backdrop
+        # The backdrop/map
+        # TODO: Let the player select which map they want to play
         self.bg = TMXJsonMap('res/maps/grass-map1.json')
 
         # Some properties
