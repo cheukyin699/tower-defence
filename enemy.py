@@ -32,7 +32,7 @@ class bEnemy(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, e):
         pygame.sprite.Sprite.__init__(self)
-        
+
         self.rmanager = e.rmanager
 
         self.image = self.rmanager.sprites[self.rmanager.data['enemies'][e.eid]['sprite']].copy()
@@ -52,7 +52,7 @@ class Enemy(pygame.sprite.Sprite):
         # The path index
         self.pathind = 0
         self.path = []
-        
+
         # If offscreen, don't give anyone money
         self.offscreen = False
 
@@ -177,21 +177,21 @@ class PinkEnemy(Enemy):
 
     def draw(self, surface):
         Enemy.draw(self, surface)
-        
+
 class BlackEnemy(Enemy):
     def __init__(self, en):
         self.eid = 5
-        
+
         Enemy.__init__(self, en)
-        
+
         self.child = [4, 4]
-        
+
     def update(self, gs):
         Enemy.update(self, gs)
-        
+
     def draw(self, surface):
         Enemy.draw(self, surface)
- 
+
 enem_Map = [RedEnemy, BlueEnemy, GreenEnemy, YellowEnemy, PinkEnemy, BlackEnemy]
 
 

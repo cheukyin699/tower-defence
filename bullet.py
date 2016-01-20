@@ -34,7 +34,7 @@ class Missile(Bullet):
 
         # The explosion radius
         self.exp_rad = 100
-        
+
     def hit(self, gs, enem):
         for e in gs.enemies:
             dist = game.getDist(self.rect, e.rect)
