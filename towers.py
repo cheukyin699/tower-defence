@@ -3,6 +3,8 @@ import math
 import game
 import bullet
 
+sellRate = .75
+
 def getDist(a, b):
     return math.sqrt((a.centerx-b.centerx)**2+(a.centery-b.centery)**2)
 
@@ -54,6 +56,7 @@ class rTower(pygame.sprite.Sprite):
     '''
     The tower displayed that does the actual fighting
     Used in-game only
+    Stands for REAL Tower
     '''
     def __init__(self, t):
         pygame.sprite.Sprite.__init__(self)
@@ -90,12 +93,12 @@ class rTower(pygame.sprite.Sprite):
         '''
         self.target = 0
         self.targetbt = game.Button.sMade(type="button",text='First', sprite='Button1',sound='wood-click',
-                pos=[0,30*2], rmanager=self.rmanager)
+                pos=[0,30 * 2], rmanager=self.rmanager)
         self.targetbt.callback(self.cycle_targeting)
 
         # Sell button
         self.sellbt = game.Button.sMade(type="button",text="Sell",sprite='Button1',sound='wood-click',
-                pos=[0,30*3+5],size=[120,30],rmanager=self.rmanager)
+                pos=[0,30 * 3 + 5],size=[120,30],rmanager=self.rmanager)
         self.sellbt.callback(self.sell)
 
         '''
@@ -110,18 +113,18 @@ class rTower(pygame.sprite.Sprite):
             self.projectile = None
 
     def cost_update(self):
-        self.sellbt.text = "Sell $%d" % int(self.cost * .75)
+        self.sellbt.text = "Sell $%d" % int(self.cost * sellRate)
 
     def sell(self):
         if not self.sold:
             self.sold = True
             if self.gs.state != game.Mode.sandbox:
                 # Give moneys if not sandbox
-                self.gs.money += int(self.cost * 0.75)
+                self.gs.money += int(self.cost * sellRate)
             self.kill()
 
     def cycle_targeting(self):
-        self.target = (self.target+1)%4
+        self.target = (self.target + 1) % 4
         if self.target == 0:
             self.targetbt.text = 'First'
         elif self.target == 1:
@@ -186,7 +189,7 @@ class rTower(pygame.sprite.Sprite):
         '''
         # Draws the label
         namelbl = self.rmanager.fonts['monospace'].render(self.name, True, game.Color.blue)
-        surface.blit(namelbl, (0, namelbl.get_rect().h*2))
+        surface.blit(namelbl, (0, namelbl.get_rect().h * 2))
         # Update buttons
         self.cost_update()
         self.targetbt.update()

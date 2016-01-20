@@ -28,7 +28,7 @@ class Layer:
 
     def initSurface(self, tileset):
         # Make the surface
-        self.image = pygame.Surface((self.width*self.tilewidth, self.height*self.tileheight))
+        self.image = pygame.Surface((self.width*self.tilewidth, self.height * self.tileheight))
         # Now, blit EVERYTHING to the surface
         for i in xrange(len(self.data)):
             # REM: 'i' is the index and 'data[i]' is the id

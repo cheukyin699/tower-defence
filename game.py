@@ -584,8 +584,8 @@ class GameState(State):
             if overlap:
                 col = Color.red
             pygame.draw.circle(self.surface, col, (mp[0],mp[1]), self.gm.drag.range, 1)
-            mp[0] -= self.gm.drag.rect.w/2
-            mp[1] -= self.gm.drag.rect.h/2
+            mp[0] -= self.gm.drag.rect.w / 2
+            mp[1] -= self.gm.drag.rect.h / 2
             self.surface.blit(self.gm.drag.orgimage, mp)
 
         pygame.draw.circle(self.surface, Color.red, [32,240], 1)
@@ -661,7 +661,7 @@ class GameState(State):
 
         # If you lose (0 lives), then go back to menu after displaying message
         if self.lives <= 0 and not self.end_game:
-            ot = OverheadText(self.rmanager, 'You SUCK', [self.SIZE[0]/2,self.SIZE[1]/2], [200,200])
+            ot = OverheadText(self.rmanager, 'You SUCK', [self.SIZE[0] / 2, self.SIZE[1] / 2], [200,200])
             self.fx.add(ot)
             self.fadeout = ot.life
             self.end_game = True
@@ -697,7 +697,7 @@ class GameState(State):
 
         # Check the game menu
         if self.gm.rect.collidepoint(mx, my):
-            self.gm.handlemousestate((mx, my-self.gm.rect.y), mstate)
+            self.gm.handlemousestate((mx, my - self.gm.rect.y), mstate)
         # Check if you are dragging something from the game menu
         # and you drop it in the screen
         if self.gm.drag != None and mstate == 'U':
@@ -710,8 +710,8 @@ class GameState(State):
                     break
             if not overlap:
                 t = self.gm.drag.tower(self.gm.drag)
-                t.rect.x = mx-t.rect.w/2
-                t.rect.y = my-t.rect.h/2
+                t.rect.x = mx-t.rect.w / 2
+                t.rect.y = my-t.rect.h / 2
                 self.towers.add(t)
                 self.gm.drag = None
                 # TAKE YO MONEY
