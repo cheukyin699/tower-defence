@@ -3,7 +3,7 @@ tower-defence
 
 ___tower-defence___ is a tower defence game made in python2 with pygame.
 
-Author: Cheuk Yin Ng <chucksys88@gmail.com>
+Author: Cheuk Yin Ng
 
 Version: v0.0.0 non-released
 
