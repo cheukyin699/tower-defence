@@ -81,7 +81,8 @@ class OverheadText(pygame.sprite.Sprite):
 
 class Button(Sprite):
     '''
-    The base class for a button.
+    The base class for a button. This is an actual full-on class for a button,
+    and it works similar to FLTK ones in that it tracks callbacks.
     '''
     def __init__(self, data, rmanager):
         Sprite.__init__(self, data, rmanager)

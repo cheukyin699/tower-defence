@@ -1,4 +1,6 @@
 # File: utils.py
+# Description: Provides some useful functions and classes for other modules to
+#              use.
 import math
 
 def getVeloc(a, b, veloc):
@@ -83,5 +85,4 @@ class Color:
     red =       (200,   0,   0)
     green =     (  0, 200,   0)
     blue =      (  0,   0, 200)
-
     yellow =    (255, 255,   0)
