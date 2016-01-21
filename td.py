@@ -6,7 +6,7 @@ import threading                # Threading, cause we need it
 
 # Import resource manager
 import res_man
-# Import game helper functions
+# Import game
 import game
 
 

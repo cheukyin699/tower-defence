@@ -2,6 +2,9 @@ import pygame
 import game
 
 class Bullet(pygame.sprite.Sprite):
+    '''
+    Base class of bullet
+    '''
     def __init__(self, pos, veloc, dmg, hp):
         pygame.sprite.Sprite.__init__(self)
 
