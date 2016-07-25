@@ -112,22 +112,22 @@ class Sprite(pygame.sprite.Sprite):
         # If the type is a sprite, then load it up
         if self.type == 'sprite':
             self.image = rmanager.sprites[data['sprite']]
-            if data.has_key('size'):
+            if 'size' in data:
                 self.image = pygame.transform.scale(self.image, data['size'])
             self.rect = self.image.get_rect()
             self.rect.x = data['pos'][0]
             self.rect.y = data['pos'][1]
         # If has visible (true on default)
         self.visible = True
-        if data.has_key('visible'):
+        if 'visible' in data:
             self.visible = data['visible']
         # If has group
         self.group = None
-        if data.has_key('group'):
+        if 'group' in data:
             self.group = data['group']
         # If has size
         self.size = None
-        if data.has_key('size'):
+        if 'size' in data:
             self.size = data['size']
 
     def draw(self, surface):
@@ -254,7 +254,7 @@ class State:
     def changestate(self, state):
         self.state = state
 
-    def handlemousestate(self, (x, y), mstate):
+    def handlemousestate(self, xy, mstate):
         pass
 
     def update(self):
@@ -315,7 +315,7 @@ class MenuState(State):
         self.layout = self.rmanager.menulayout
         self.sprites = pygame.sprite.Group()
 
-        for key, data in self.layout.iteritems():
+        for key, data in self.layout.items():
             if data['type'] == 'button':
                 bt = Button(data, rmanager)
                 if key == 'play-bt':
@@ -344,12 +344,13 @@ class MenuState(State):
             if s.group == 'play':
                 s.visible = not s.visible
 
-    def handlemousestate(self, (mx, my), mstate='N'):
+    def handlemousestate(self, m, mstate='N'):
         '''
         'N' is for normal
         'O' is for over
         'P' is for pressed
         '''
+        mx, my = m
         for s in self.sprites.sprites():
             if s.rect.collidepoint(mx, my):
                 s.state = mstate
@@ -411,7 +412,7 @@ class GameMenu(pygame.sprite.Sprite):
 
         # Init towers
         ind = 0
-        for data in self.rmanager.data['towers'].itervalues():
+        for data in self.rmanager.data['towers'].values():
             t = towers.Tower(self.rmanager, data, (50*ind+100, 5), self.gs)
             self.tlist.add(t)
             ind += 1
@@ -485,7 +486,8 @@ class GameMenu(pygame.sprite.Sprite):
             spawnen.path = self.rmanager.data['maps'][self.gs.currentmap]['path']
             self.gs.enemies.append(spawnen)
 
-    def handlemousestate(self, (mx, my), mstate='N'):
+    def handlemousestate(self, m, mstate='N'):
+        mx, my = m
         if self.focus == None:
             if self.drag != None and mstate == 'U':
                 self.drag = None
@@ -564,7 +566,7 @@ class GameState(State):
         self.surface.blit(self.bg.layers['background'].image, (0,0))
 
         if not self.end_game:
-            for i in xrange(len(self.enemies)):
+            for i in range(len(self.enemies)):
                 self.enemies[i].draw(self.surface)
             self.towers.draw(self.surface)
             self.projectiles.draw(self.surface)
@@ -679,7 +681,8 @@ class GameState(State):
             # When all enemies are killed, start next wave
             self.runthru_enemy = True
 
-    def handlemousestate(self, (mx, my), mstate='N'):
+    def handlemousestate(self, m, mstate='N'):
+        mx, my = m
         if mstate == 'U':
             # Check to see if you are clicking off the focused
             # tower. To click off the focused tower, click on

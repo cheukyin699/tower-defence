@@ -17,7 +17,7 @@ class Tower(pygame.sprite.Sprite):
     The tower with the money displayed
     Only used in menus
     '''
-    def __init__(self, rmanager, data, (x,y), gs):
+    def __init__(self, rmanager, data, xy, gs):
         pygame.sprite.Sprite.__init__(self)
 
         self.rmanager = rmanager
@@ -35,8 +35,8 @@ class Tower(pygame.sprite.Sprite):
 
         costlbl = self.rmanager.fonts['monospace'].render('$'+str(self.cost), True, game.Color.green)
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = xy[0]
+        self.rect.y = xy[1]
 
         costlbl = pygame.transform.scale(costlbl, (self.rect.w, costlbl.get_rect().h))
         self.image.blit(costlbl, (0,0))
@@ -134,7 +134,8 @@ class rTower(pygame.sprite.Sprite):
         else:
             self.targetbt.text = 'Strong'
 
-    def handlemousestate(self, (mx, my), mstate='N'):
+    def handlemousestate(self, m, mstate='N'):
+        mx, my = m
         self.targetbt.state = 'N'
         self.sellbt.state = 'N'
         if self.targetbt.rect.collidepoint(mx, my):

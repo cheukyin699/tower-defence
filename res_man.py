@@ -38,7 +38,7 @@ class Resources:
         '''
         Loads some music filenames
         '''
-        for key, data in self.parsetree['musics'].iteritems():
+        for key, data in self.parsetree['musics'].items():
             self.musics[key] = data
             self.status_text = 'Loading ' + data
 
@@ -47,7 +47,7 @@ class Resources:
         '''
         Loads sounds and musics specified in Json file
         '''
-        for key, data in self.parsetree['sounds'].iteritems():
+        for key, data in self.parsetree['sounds'].items():
             self.sounds[key] = pygame.mixer.Sound(data)
             self.status_text = 'Loading ' + data
 
@@ -58,7 +58,7 @@ class Resources:
         # Load the sprite sheet
         self.ssheet = pygame.image.load(self.parsetree['sprites']['file'])
 
-        for key, data in self.parsetree['sprites']['sprites'].iteritems():
+        for key, data in self.parsetree['sprites']['sprites'].items():
             # NOTE: data = rectangle which 'key' is located
             self.sprites[key] = self.ssheet.subsurface(data)
             self.status_text = 'Loading ' + key

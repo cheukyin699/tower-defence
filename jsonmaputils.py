@@ -14,23 +14,25 @@ class TileSet:
         self.image = pygame.image.load(self.imgfn.replace('..', 'res'))
 
     def getMaxTileId(self):
-        return self.fgid + (self.imgheight / self.tileheight) * (self.imgwidth / self.tilewidth)
+        return int(self.fgid +
+                (self.imgheight / self.tileheight) *
+                (self.imgwidth  / self.tilewidth))
 
 class Layer:
-    def __init__(self, data, (tw, th)):
+    def __init__(self, data, t):
         self.data = data['data']
         self.name = data['name']
         self.width = data['width']              # The number of tiles
         self.height = data['height']            # The number of tiles
 
-        self.tilewidth = tw
-        self.tileheight = th
+        self.tilewidth = t[0]
+        self.tileheight = t[1]
 
     def initSurface(self, tileset):
         # Make the surface
         self.image = pygame.Surface((self.width*self.tilewidth, self.height * self.tileheight))
         # Now, blit EVERYTHING to the surface
-        for i in xrange(len(self.data)):
+        for i in range(len(self.data)):
             # REM: 'i' is the index and 'data[i]' is the id
             xc, yc = ((i % self.width), (i // self.width))
             self.image.blit(tileset[self.data[i]], (xc * self.tilewidth, yc * self.tileheight))
@@ -49,7 +51,7 @@ class TMXJsonMap:
         # Init tilesets
         for ts in self.map['tilesets']:
             tileset = TileSet(ts)
-            for x in xrange(tileset.getMaxTileId() - tileset.fgid):
+            for x in range(tileset.getMaxTileId() - tileset.fgid):
                 # First, convert 1d coordinates into 2d
                 xc, yc = (x % (tileset.imgwidth / tileset.tilewidth), x // (tileset.imgwidth / tileset.tilewidth))
                 # Then, get the rectangle

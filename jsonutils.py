@@ -5,17 +5,14 @@ import json, re
 
 pat = re.compile('(//.*\n)')
 
-def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None, parse_int=None,
-          parse_constant=None):
+def loads(s):
     s = re.sub(pat, '', s)
-    return json.loads(s, encoding, cls, object_hook, parse_float,
-                      parse_int, parse_constant)
+    return json.loads(s)
 
-def load(fp, encoding=None, cls=None, object_hook=None, parse_float=None, parse_int=None,
-         parse_constant=None):
+def load(fp):
     txt = fp.read()
     fp.close()
-    return loads(txt, encoding, cls, object_hook, parse_float, parse_int, parse_constant)
+    return loads(txt)
 
 if __name__ == '__main__':
     jsontest = '''
@@ -25,4 +22,4 @@ if __name__ == '__main__':
         "world": 2    // This is another comment
     }
     '''
-    print loads(jsontest)
+    print(loads(jsontest))
