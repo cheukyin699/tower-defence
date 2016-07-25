@@ -1,6 +1,5 @@
 # File: game.py
 # Description: Provides useful classes and functions for the game
-
 import pygame
 import towers
 import enemy

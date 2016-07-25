@@ -1,8 +1,6 @@
 import pygame
 import game
 
-
-
 class bEnemy(pygame.sprite.Sprite):
     def __init__(self, rmanager, data, pos):
         pygame.sprite.Sprite.__init__(self)

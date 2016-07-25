@@ -1,6 +1,5 @@
 # File: res_man.py
 # Description: Manages all the resources
-
 import pygame, jsonutils
 
 class Resources:
